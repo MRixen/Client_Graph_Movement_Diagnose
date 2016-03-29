@@ -6,6 +6,7 @@ using WindowsFormsApplication6;
 using System.Threading;
 using System.Net.Sockets;
 using System.Net;
+using System.Data;
 
 namespace RBC
 {
@@ -63,7 +64,7 @@ namespace RBC
             this.tunnelingMessage += new MessageTunnelingHandler(tcpDiagnoseServer_tunnelingMessage);
         }
 
-        public void clientInit()
+        public bool clientInit()
         {
             //String ip = "192.168.1.3";
             String ip = "127.0.0.1";
@@ -76,33 +77,39 @@ namespace RBC
                     tcpClient.Connect(ip, port);
                     
                     networkStream = tcpClient.GetStream();
-                    
 
-                if (tcpClient.Connected)
-                {
-                    Debug.Write("Connected" + "\n");
-                    startReceiverThread();
-                    // Start server
-                    // this.tcpserver = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Parse(this.networkConfig.ipAddress), this.networkConfig.port);
-                    // this.tcpserver.Start();
 
-                    // Start thread to listening for new clients
-                    // this.clientListenerThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientListener));
-                    // this.clientListenerThread.Start();
+                    if (tcpClient.Connected)
+                    {
+                        Debug.Write("Connected" + "\n");
+                        startReceiverThread();
+                        // Start server
+                        // this.tcpserver = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Parse(this.networkConfig.ipAddress), this.networkConfig.port);
+                        // this.tcpserver.Start();
 
-                    // Start thread to listening on removed clients
-                    //this.clientRemoverThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientRemover));
-                    // this.clientRemoverThread.Start();
+                        // Start thread to listening for new clients
+                        // this.clientListenerThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientListener));
+                        // this.clientListenerThread.Start();
 
-                    //if (this.statusChangedEvent != null)
-                    //    this.statusChangedEvent(this.communicationName + ": Server started. Listening for Clients at Port - " + this.networkConfig.port);
-                }
-                else Debug.Write("Client not connected" + "\n");
+                        // Start thread to listening on removed clients
+                        //this.clientRemoverThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientRemover));
+                        // this.clientRemoverThread.Start();
+
+                        //if (this.statusChangedEvent != null)
+                        //    this.statusChangedEvent(this.communicationName + ": Server started. Listening for Clients at Port - " + this.networkConfig.port);
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.Write("Client not connected" + "\n");
+                        return false;
+                    }
 
             }
             catch (System.Net.Sockets.SocketException ex)
             {
                 Debug.Write("Error in clientServerInit: " + ex);
+                return false;
             }
         }
 
@@ -316,11 +323,11 @@ namespace RBC
 
                             // TODO: Validate the length of incoming message and the content to request resend
 
-                            //fire the receiveevent
+                            // Fire the receive event and save sensor values to database
                             if (this.messageReceivedEvent != null) this.messageReceivedEvent(msgArray);
                             //if (this.tunnelingMessage != null) this.tunnelingMessage(incomingMessageTemp);
                             // Test to use one thread for tunneling to client and to filtering...
-                            // sendToPhone(incomingMessageTemp);
+                            //sendToPhone(incomingMessageTemp);
                             //Debug.Write("Message received: " + incomingMessageTemp + "\n");
                             msgArray = new String[] { "", "" };
                             incomingMessageTemp = "";
@@ -403,7 +410,6 @@ namespace RBC
 
             //}
         }
-
 
         void tcpDiagnoseServer_tunnelingMessage(string receivedMessage)
         {

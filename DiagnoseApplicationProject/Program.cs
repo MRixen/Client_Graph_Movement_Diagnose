@@ -6,8 +6,11 @@ using System.Windows.Forms;
 
 namespace WindowsFormsApplication6
 {
+
     static class Program
-    {
+    { 
+        
+        
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -17,9 +20,9 @@ namespace WindowsFormsApplication6
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var form1 = new FormX();
-            
-            form1.Show();
+           var formMain = new FormDatabase();
+            formMain.startApplication();
+            formMain.Show();
             
             Application.Run();
         }

@@ -33,28 +33,21 @@ namespace WindowsFormsApplication6
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            this.button1 = new System.Windows.Forms.Button();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.label_sensorID = new System.Windows.Forms.Label();
+            this.button3 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.Snapshot = new System.Windows.Forms.Button();
             this.chartX = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.numericUpDown_tableSelector = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartX)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tableSelector)).BeginInit();
             this.SuspendLayout();
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(3, 3);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(111, 23);
-            this.button1.TabIndex = 0;
-            this.button1.Text = "Start Acquisition";
-            this.toolTip1.SetToolTip(this.button1, "(Re-)Start recording of cycle time.");
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.startButtonClicked);
             // 
             // tableLayoutPanel1
             // 
@@ -73,8 +66,11 @@ namespace WindowsFormsApplication6
             // 
             // panel1
             // 
+            this.panel1.Controls.Add(this.numericUpDown_tableSelector);
+            this.panel1.Controls.Add(this.label_sensorID);
+            this.panel1.Controls.Add(this.button3);
+            this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.Snapshot);
-            this.panel1.Controls.Add(this.button1);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
             this.panel1.MinimumSize = new System.Drawing.Size(0, 28);
@@ -82,9 +78,40 @@ namespace WindowsFormsApplication6
             this.panel1.Size = new System.Drawing.Size(709, 29);
             this.panel1.TabIndex = 4;
             // 
+            // label_sensorID
+            // 
+            this.label_sensorID.AutoSize = true;
+            this.label_sensorID.Location = new System.Drawing.Point(249, 8);
+            this.label_sensorID.Name = "label_sensorID";
+            this.label_sensorID.Size = new System.Drawing.Size(57, 13);
+            this.label_sensorID.TabIndex = 9;
+            this.label_sensorID.Text = "Sensor ID:";
+            // 
+            // button3
+            // 
+            this.button3.Enabled = false;
+            this.button3.Location = new System.Drawing.Point(89, 3);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(74, 23);
+            this.button3.TabIndex = 8;
+            this.button3.Text = "Pause";
+            this.toolTip1.SetToolTip(this.button3, "Create an image of the graph.");
+            this.button3.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Enabled = false;
+            this.button2.Location = new System.Drawing.Point(169, 3);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(74, 23);
+            this.button2.TabIndex = 7;
+            this.button2.Text = "Clear";
+            this.toolTip1.SetToolTip(this.button2, "Create an image of the graph.");
+            this.button2.UseVisualStyleBackColor = true;
+            // 
             // Snapshot
             // 
-            this.Snapshot.Location = new System.Drawing.Point(119, 3);
+            this.Snapshot.Location = new System.Drawing.Point(9, 3);
             this.Snapshot.Name = "Snapshot";
             this.Snapshot.Size = new System.Drawing.Size(74, 23);
             this.Snapshot.TabIndex = 6;
@@ -105,7 +132,7 @@ namespace WindowsFormsApplication6
             this.chartX.Series.Add(series1);
             this.chartX.Size = new System.Drawing.Size(709, 603);
             this.chartX.TabIndex = 3;
-            this.chartX.Text = "chart1";
+            this.chartX.Text = "chartX";
             title1.Font = new System.Drawing.Font("Arial", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             title1.Name = "Title1";
             this.chartX.Titles.Add(title1);
@@ -116,9 +143,17 @@ namespace WindowsFormsApplication6
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
-            // toolTip1
+            // numericUpDown_tableSelector
             // 
-            this.toolTip1.Popup += new System.Windows.Forms.PopupEventHandler(this.toolTip1_Popup);
+            this.numericUpDown_tableSelector.Location = new System.Drawing.Point(309, 5);
+            this.numericUpDown_tableSelector.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.numericUpDown_tableSelector.Name = "numericUpDown_tableSelector";
+            this.numericUpDown_tableSelector.Size = new System.Drawing.Size(47, 20);
+            this.numericUpDown_tableSelector.TabIndex = 10;
             // 
             // FormX
             // 
@@ -129,16 +164,18 @@ namespace WindowsFormsApplication6
             this.MinimumSize = new System.Drawing.Size(600, 600);
             this.Name = "FormX";
             this.Text = "Movement Diagnose - Window 1 (X-Value)";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormX_Closing);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartX)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tableSelector)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Button button1;
 
         // Added
         private String messageOld = "";
@@ -148,6 +185,10 @@ namespace WindowsFormsApplication6
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartX;
+        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Label label_sensorID;
+        private System.Windows.Forms.NumericUpDown numericUpDown_tableSelector;
     }
 }
 

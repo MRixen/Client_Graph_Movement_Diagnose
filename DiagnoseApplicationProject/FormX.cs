@@ -22,10 +22,6 @@ namespace WindowsFormsApplication6
         //TOOD Add diagram
         // Save all cycletime-data with article id
 
-        private System.IO.StreamWriter writer = new System.IO.StreamWriter("DiagnoseDebugLog.log", true);
-        private RBC.TcpIpCommunicationUnit tcpDiagnoseClient = null;
-        private String dllConfigurationFileName = "";
-        //private RBC.Configuration dllConfiguration = null;
         private int xAxisRate = 1;
         private Stopwatch stopWatch2 = new Stopwatch();
         private long stopWatchOld = 0;
@@ -41,24 +37,27 @@ namespace WindowsFormsApplication6
         private bool firtStart;
         private string graphName = "x";
         private NotifyIcon notifyIcon;
-        private FormY formY;
-        private FormZ formZ;
-        private Chart chartY, chartZ;
+        private FormDatabase formBaseContext;
+        private int sensorID;
 
-        public FormX()
+
+        public FormX(Object context, int sensorID)
         {
             InitializeComponent();
+            formBaseContext = (FormDatabase)context;
 
-            formY = new FormY();
-            formZ = new FormZ();
-            chartY = formY.getChart();
-            chartZ = formZ.getChart();
-            formY.Show();
-            formZ.Show();
-
+            this.sensorID = sensorID;
+            label_sensorID.Text = "Sensor ID: " + this.sensorID;
             firtStart = false;
             // label1.Text = "Bereich: " + MIN_X_INCREMENT + " - " + MAX_X_INCREMENT;
             notifyIcon = new NotifyIcon();
+
+            
+        }
+
+        public Chart getChart()
+        {
+            return chartX;
         }
 
         private void setTitle(string name)
@@ -68,148 +67,14 @@ namespace WindowsFormsApplication6
             //title.Font = new System.Drawing.Font("Arial", 16, FontStyle.Bold);           
         }
 
-        private void startButtonClicked(object sender, EventArgs e)
-        {
-            currentCycle = 0;
-            if (cyclesToAcquire > MAX_CYCLES) cyclesToAcquire = MAX_CYCLES;
-            if (cyclesToAcquire < MIN_CYCLES) cyclesToAcquire = MIN_CYCLES;
-            
-            if (!firtStart)
-            {
-                firtStart = true;
-                tcpDiagnoseClient = new RBC.TcpIpCommunicationUnit("DiagnoseServer");
-                //register the callbackevents from tcpservers
-                tcpDiagnoseClient.messageReceivedEvent += new RBC.TcpIpCommunicationUnit.MessageReceivedEventHandler(tcpDiagnoseServer_messageReceivedEvent);
-                tcpDiagnoseClient.errorEvent += new RBC.TcpIpCommunicationUnit.ErrorEventHandler(tcpPLCServer_errorEvent);
-                tcpDiagnoseClient.statusChangedEvent += new RBC.TcpIpCommunicationUnit.StatusChangedEventHandler(tcpDiagnoseServer_statusChangedEvent);
-                tcpDiagnoseClient.clientInit();
-            }
-            // Clear graph if user press start button again
-            else
-            {
-                foreach (var series in chartX.Series) series.Points.Clear();
-                currentCycle = 1;
-            }
-        }
-
-
         private void UpdateText(string text)
         {
             //textBox1.Text = text;
         }
 
-        private void UpdateChart1(string[] msg)
+        public void UpdateChart1(string[] msg)
         {
             setDataToGraph(msg);
-        }
-
-        void tcpDiagnoseServer_statusChangedEvent(string statusMessage)
-        {
-            //try
-            //{
-            //    if (tcpDiagnoseServer.dllConfiguration.debuggingActive == true)
-            //    {
-            //        this.writer.WriteLine("Statuschange - Diagnose: " + statusMessage);
-            //        this.writer.Flush();
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-
-            //}
-        }
-
-        //public void SetConfigurationPath(String configurationpath)
-        //{
-        //    dllConfigurationFileName = configurationpath;
-
-        //    this.loadConfiguration();
-        //}
-
-        void tcpPLCServer_errorEvent(string errorMessage)
-        {
-            System.Windows.Forms.MessageBox.Show("Error occured - " + errorMessage);
-        }
-
-        void tcpDiagnoseServer_messageReceivedEvent(string[] receivedMessage)
-        {           
-            //Debug.Write("rec message: " + receivedMessage[0] + "\n");
-            //Debug.Write("rec command: " + receivedMessage[1] + "\n");  
-
-            String message = receivedMessage[0];
-            String command = receivedMessage[1];
-            try
-            {
-                switch (command)
-                {
-
-                    case "0":
-                        // remove x, y, z character in message string
-                        message = message.Replace("x", "");
-                        message = message.Replace("y", "");
-                        message = message.Replace("z", "");
-                        //message = message.Replace(".", ",");
-                        //Debug.Write("mod message: " + message + "\n");  
-
-                        // Split message to x, y, z and timestamp value
-                        String[] messageData = message.Split(':');
-
-                        //Debug.Write("Run UpdatChart1\n");
-                        chartX.Invoke(new RBC.TcpIpCommunicationUnit.UpdateChartCallback(this.UpdateChart1),
-                        new object[] { messageData });
-                        chartY.Invoke(new RBC.TcpIpCommunicationUnit.UpdateChartCallback(formY.UpdateChart1),
-                        new object[] { messageData });
-                        chartZ.Invoke(new RBC.TcpIpCommunicationUnit.UpdateChartCallback(formZ.UpdateChart1),
-                        new object[] { messageData });
-                        break;
-                    case "1":
-                        break;
-                    case "2":
-                        break;
-                    case "3":
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (InvalidOperationException e)
-            {
-
-            }
-        }
-
-        //private void loadConfiguration()
-        //{
-        //    //if (System.IO.File.Exists(this.dllConfigurationFileName))
-        //    //{
-        //    //    System.Xml.Serialization.XmlSerializer formatter = new System.Xml.Serialization.XmlSerializer(typeof(RBC.Configuration));
-        //    //    System.IO.FileStream aFile = new System.IO.FileStream(this.dllConfigurationFileName, System.IO.FileMode.Open);
-        //    //    byte[] buffer = new byte[aFile.Length];
-        //    //    aFile.Read(buffer, 0, (int)aFile.Length);
-        //    //    System.IO.MemoryStream stream = new System.IO.MemoryStream(buffer);
-        //    //    this.dllConfiguration = (RBC.Configuration)formatter.Deserialize(stream);
-        //    //    aFile.Close();
-        //    //    stream.Close();
-        //    //}
-        //    //else
-        //    //{
-
-        //        this.dllConfiguration = new RBC.Configuration();
-        //        this.dllConfiguration.debuggingActive = false;
-        //    //}
-        //}
-
-        private void cyclesButtonClicked(object sender, EventArgs e)
-        {
-            //try
-            //{
-            //    int xAxisRateTemp = Int32.Parse(textBox1.Text);
-            //    if ((xAxisRateTemp >= 1) && (xAxisRateTemp <= 10)) xAxisRate = xAxisRateTemp;
-            //}
-            //catch (System.FormatException ex)
-            //{
-
-            //}
         }
 
         private void setDataToGraph(String[] message)
@@ -239,20 +104,6 @@ namespace WindowsFormsApplication6
             //messageOld = message[1];
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            if (string.Equals((sender as Button).Name, @"CloseButton"))
-            {
-                // Do something proper to CloseButton.
-            }
-            else
-            {
-                tcpDiagnoseClient.closeAllConnections();
-            }
-
-            if(notifyIcon != null) notifyIcon.Dispose();
-        }
-
         private void Snapshot_Click(object sender, EventArgs e)
         {
             Rectangle bounds = this.Bounds;
@@ -262,7 +113,7 @@ namespace WindowsFormsApplication6
                 {
                     g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
                 }
-                bitmap.Save("C://Users//Manuel.Rixen//Desktop//Z_data_" + graphName + ".jpg", ImageFormat.Jpeg);
+                bitmap.Save("C://Users//Manuel.Rixen//Desktop//X_data_" + graphName + ".jpg", ImageFormat.Jpeg);
             }
 
 
@@ -270,16 +121,17 @@ namespace WindowsFormsApplication6
             
             notifyIcon.Visible = true;
 
-            notifyIcon.BalloonTipTitle = "Movement Diagnose";
+            notifyIcon.BalloonTipTitle = "Movement Diagnose X Data";
             notifyIcon.Icon = SystemIcons.Application;
             notifyIcon.BalloonTipText = "Screenshot created succesfully";
-            notifyIcon.ShowBalloonTip(1000);
+            notifyIcon.ShowBalloonTip(300);
             
         }
 
-        private void toolTip1_Popup(object sender, PopupEventArgs e)
+        private void FormX_Closing(object sender, FormClosingEventArgs e)
         {
-
+            formBaseContext.setCheckboxUnchecked_X = CheckState.Unchecked;
+            if (notifyIcon != null) notifyIcon.Dispose();
         }
 
     }
