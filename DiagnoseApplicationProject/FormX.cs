@@ -38,21 +38,23 @@ namespace WindowsFormsApplication6
         private string graphName = "x";
         private NotifyIcon notifyIcon;
         private FormDatabase formBaseContext;
-        private int sensorID;
+        private int sampleTimeFactor;
+        private int sampleStep;
+        private int DEFAULT_SAMPLE_TIME_FACTOR = Properties.Settings.Default.DEFAULT_SAMPLE_TIME_FACTOR;
+        private int sensorIdToShow = -1;
 
 
-        public FormX(Object context, int sensorID)
+        public FormX(Object context, int sampleTimeFactor)
         {
             InitializeComponent();
             formBaseContext = (FormDatabase)context;
 
-            this.sensorID = sensorID;
-            label_sensorID.Text = "Sensor ID: " + this.sensorID;
+            if (sampleTimeFactor >= (DEFAULT_SAMPLE_TIME_FACTOR * 10)) this.sampleTimeFactor = sampleTimeFactor;
+            else this.sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR * 10;
+            sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
+            this.sensorIdToShow = Convert.ToInt32(numericUpDownSensorSelector.Value);
             firtStart = false;
-            // label1.Text = "Bereich: " + MIN_X_INCREMENT + " - " + MAX_X_INCREMENT;
-            notifyIcon = new NotifyIcon();
-
-            
+            notifyIcon = new NotifyIcon();           
         }
 
         public Chart getChart()
@@ -72,9 +74,17 @@ namespace WindowsFormsApplication6
             //textBox1.Text = text;
         }
 
-        public void UpdateChart1(string[] msg)
+        public void UpdateChartX(string[] msg, string currentSensorID)
         {
-            setDataToGraph(msg);
+            if (sensorIdToShow == Int32.Parse(currentSensorID))
+            {
+                if (sampleStep == sampleTimeFactor)
+                {
+                    setDataToGraph(msg);
+                    sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
+                }
+                else sampleStep++;
+            }
         }
 
         private void setDataToGraph(String[] message)
@@ -92,6 +102,9 @@ namespace WindowsFormsApplication6
             chartX.ChartAreas[0].AxisY.Title = "Angle X [deg]";
             chartX.ChartAreas[0].AxisX.MajorGrid.Interval = 1;
 
+            
+
+            
             //stopWatch2.Start();
 
             //if ((message[1] != messageOld) && ((stopWatch2.ElapsedMilliseconds) >= (stopWatchOld + (xAxisRate * 1000))))
@@ -132,6 +145,12 @@ namespace WindowsFormsApplication6
         {
             formBaseContext.setCheckboxUnchecked_X = CheckState.Unchecked;
             if (notifyIcon != null) notifyIcon.Dispose();
+        }
+
+        private void numericUpDownSensorSelector_valueChanged(object sender, EventArgs e)
+        {
+            chartX.Series[0].Points.Clear();
+            this.sensorIdToShow = Convert.ToInt32(((NumericUpDown)sender).Value);
         }
 
     }

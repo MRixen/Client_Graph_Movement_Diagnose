@@ -16,5 +16,14 @@
     <Setting Name="MIN_TABLE_AMOUNT" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">0</Value>
     </Setting>
+    <Setting Name="SAMPLE_TIME" Type="System.Single" Scope="Application">
+      <Value Profile="(Default)">0.01</Value>
+    </Setting>
+    <Setting Name="DEFAULT_SAMPLE_TIME_FACTOR" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="MAX_ALIVE_SIGNAL_PAUSE" Type="System.Int32" Scope="Application">
+      <Value Profile="(Default)">5000</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

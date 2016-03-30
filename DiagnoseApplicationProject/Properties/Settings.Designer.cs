@@ -52,5 +52,32 @@ namespace WindowsFormsApplication6.Properties {
                 return ((int)(this["MIN_TABLE_AMOUNT"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.01")]
+        public float SAMPLE_TIME {
+            get {
+                return ((float)(this["SAMPLE_TIME"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int DEFAULT_SAMPLE_TIME_FACTOR {
+            get {
+                return ((int)(this["DEFAULT_SAMPLE_TIME_FACTOR"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("5000")]
+        public int MAX_ALIVE_SIGNAL_PAUSE {
+            get {
+                return ((int)(this["MAX_ALIVE_SIGNAL_PAUSE"]));
+            }
+        }
     }
 }

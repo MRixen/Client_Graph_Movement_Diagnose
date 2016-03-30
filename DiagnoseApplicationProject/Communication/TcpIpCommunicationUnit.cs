@@ -29,7 +29,7 @@ namespace RBC
         public event MessageTunnelingHandler tunnelingMessage;
 
         public delegate void UpdateTextCallback(string text);
-        public delegate void UpdateChartCallback(string[] msg);
+        public delegate void UpdateChartCallback(string[] msg, string sensorID);
 
         String communicationName = "Unknown";
 

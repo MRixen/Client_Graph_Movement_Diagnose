@@ -44,17 +44,23 @@ namespace WindowsFormsApplication6
         private CheckBox checkbox;
         private FormDatabase formBaseContext;
         private int sensorID;
+        private int sampleTimeFactor;
+        private int sampleStep;
+        private int DEFAULT_SAMPLE_TIME_FACTOR = Properties.Settings.Default.DEFAULT_SAMPLE_TIME_FACTOR;
+        private int sensorIdToShow = -1;
 
 
         public FormY(Object context, int sensorID)
         {
             InitializeComponent();
             formBaseContext = (FormDatabase)context;
-            this.sensorID = sensorID;
-            label_sensorID.Text = "Sensor ID: " + this.sensorID;
+
+            if (sampleTimeFactor >= (DEFAULT_SAMPLE_TIME_FACTOR * 10)) this.sampleTimeFactor = sampleTimeFactor;
+            else this.sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR * 10;
+            sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
+            this.sensorIdToShow = Convert.ToInt32(numericUpDownSensorSelector.Value);
             firtStart = false;
-            // label1.Text = "Bereich: " + MIN_X_INCREMENT + " - " + MAX_X_INCREMENT;
-            notifyIcon = new NotifyIcon();
+            notifyIcon = new NotifyIcon();    
         }
 
         public void setTitle(string name)
@@ -69,9 +75,17 @@ namespace WindowsFormsApplication6
             //textBox1.Text = text;
         }
 
-        public void UpdateChart1(string[] msg)
+        public void UpdateChartY(string[] msg, string currentSensorID)
         {
-            setDataToGraph(msg);
+            if (sensorIdToShow == Int32.Parse(currentSensorID))
+            {
+                if (sampleStep == sampleTimeFactor)
+                {
+                    setDataToGraph(msg);
+                    sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
+                }
+                else sampleStep++;
+            }
         }
 
         public Chart getChart()
@@ -134,6 +148,12 @@ namespace WindowsFormsApplication6
             notifyIcon.BalloonTipText = "Screenshot created succesfully";
             notifyIcon.ShowBalloonTip(300);
             
+        }
+
+        private void numericUpDownSensorSelector_valueChanged(object sender, EventArgs e)
+        {
+            chartY.Series[0].Points.Clear();
+            this.sensorIdToShow = Convert.ToInt32(((NumericUpDown)sender).Value);
         }
     }
 }

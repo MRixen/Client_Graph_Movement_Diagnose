@@ -42,11 +42,11 @@ namespace WindowsFormsApplication6
             this.chartX = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.numericUpDown_tableSelector = new System.Windows.Forms.NumericUpDown();
+            this.numericUpDownSensorSelector = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartX)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tableSelector)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSensorSelector)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -66,7 +66,7 @@ namespace WindowsFormsApplication6
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.numericUpDown_tableSelector);
+            this.panel1.Controls.Add(this.numericUpDownSensorSelector);
             this.panel1.Controls.Add(this.label_sensorID);
             this.panel1.Controls.Add(this.button3);
             this.panel1.Controls.Add(this.button2);
@@ -143,17 +143,18 @@ namespace WindowsFormsApplication6
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
-            // numericUpDown_tableSelector
+            // numericUpDownSensorSelector
             // 
-            this.numericUpDown_tableSelector.Location = new System.Drawing.Point(309, 5);
-            this.numericUpDown_tableSelector.Maximum = new decimal(new int[] {
+            this.numericUpDownSensorSelector.Location = new System.Drawing.Point(310, 5);
+            this.numericUpDownSensorSelector.Maximum = new decimal(new int[] {
             3,
             0,
             0,
             0});
-            this.numericUpDown_tableSelector.Name = "numericUpDown_tableSelector";
-            this.numericUpDown_tableSelector.Size = new System.Drawing.Size(47, 20);
-            this.numericUpDown_tableSelector.TabIndex = 10;
+            this.numericUpDownSensorSelector.Name = "numericUpDownSensorSelector";
+            this.numericUpDownSensorSelector.Size = new System.Drawing.Size(51, 20);
+            this.numericUpDownSensorSelector.TabIndex = 10;
+            this.numericUpDownSensorSelector.ValueChanged += new System.EventHandler(this.numericUpDownSensorSelector_valueChanged);
             // 
             // FormX
             // 
@@ -169,7 +170,7 @@ namespace WindowsFormsApplication6
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartX)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_tableSelector)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSensorSelector)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -188,7 +189,7 @@ namespace WindowsFormsApplication6
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label_sensorID;
-        private System.Windows.Forms.NumericUpDown numericUpDown_tableSelector;
+        private System.Windows.Forms.NumericUpDown numericUpDownSensorSelector;
     }
 }
 
