@@ -35,18 +35,16 @@ namespace WindowsFormsApplication6
             System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.numericUpDownSensorSelector = new System.Windows.Forms.NumericUpDown();
             this.label_sensorID = new System.Windows.Forms.Label();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
             this.Snapshot = new System.Windows.Forms.Button();
             this.chartX = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.numericUpDownSensorSelector = new System.Windows.Forms.NumericUpDown();
             this.tableLayoutPanel1.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSensorSelector)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartX)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -68,8 +66,6 @@ namespace WindowsFormsApplication6
             // 
             this.panel1.Controls.Add(this.numericUpDownSensorSelector);
             this.panel1.Controls.Add(this.label_sensorID);
-            this.panel1.Controls.Add(this.button3);
-            this.panel1.Controls.Add(this.button2);
             this.panel1.Controls.Add(this.Snapshot);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 3);
@@ -78,36 +74,27 @@ namespace WindowsFormsApplication6
             this.panel1.Size = new System.Drawing.Size(709, 29);
             this.panel1.TabIndex = 4;
             // 
+            // numericUpDownSensorSelector
+            // 
+            this.numericUpDownSensorSelector.Location = new System.Drawing.Point(150, 5);
+            this.numericUpDownSensorSelector.Maximum = new decimal(new int[] {
+            3,
+            0,
+            0,
+            0});
+            this.numericUpDownSensorSelector.Name = "numericUpDownSensorSelector";
+            this.numericUpDownSensorSelector.Size = new System.Drawing.Size(51, 20);
+            this.numericUpDownSensorSelector.TabIndex = 10;
+            this.numericUpDownSensorSelector.ValueChanged += new System.EventHandler(this.numericUpDownSensorSelector_valueChanged);
+            // 
             // label_sensorID
             // 
             this.label_sensorID.AutoSize = true;
-            this.label_sensorID.Location = new System.Drawing.Point(249, 8);
+            this.label_sensorID.Location = new System.Drawing.Point(89, 8);
             this.label_sensorID.Name = "label_sensorID";
             this.label_sensorID.Size = new System.Drawing.Size(57, 13);
             this.label_sensorID.TabIndex = 9;
             this.label_sensorID.Text = "Sensor ID:";
-            // 
-            // button3
-            // 
-            this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(89, 3);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(74, 23);
-            this.button3.TabIndex = 8;
-            this.button3.Text = "Pause";
-            this.toolTip1.SetToolTip(this.button3, "Create an image of the graph.");
-            this.button3.UseVisualStyleBackColor = true;
-            // 
-            // button2
-            // 
-            this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(169, 3);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(74, 23);
-            this.button2.TabIndex = 7;
-            this.button2.Text = "Clear";
-            this.toolTip1.SetToolTip(this.button2, "Create an image of the graph.");
-            this.button2.UseVisualStyleBackColor = true;
             // 
             // Snapshot
             // 
@@ -143,19 +130,6 @@ namespace WindowsFormsApplication6
             this.notifyIcon1.Text = "notifyIcon1";
             this.notifyIcon1.Visible = true;
             // 
-            // numericUpDownSensorSelector
-            // 
-            this.numericUpDownSensorSelector.Location = new System.Drawing.Point(310, 5);
-            this.numericUpDownSensorSelector.Maximum = new decimal(new int[] {
-            3,
-            0,
-            0,
-            0});
-            this.numericUpDownSensorSelector.Name = "numericUpDownSensorSelector";
-            this.numericUpDownSensorSelector.Size = new System.Drawing.Size(51, 20);
-            this.numericUpDownSensorSelector.TabIndex = 10;
-            this.numericUpDownSensorSelector.ValueChanged += new System.EventHandler(this.numericUpDownSensorSelector_valueChanged);
-            // 
             // FormX
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -169,8 +143,8 @@ namespace WindowsFormsApplication6
             this.tableLayoutPanel1.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chartX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownSensorSelector)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartX)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -186,8 +160,6 @@ namespace WindowsFormsApplication6
         private System.Windows.Forms.NotifyIcon notifyIcon1;
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartX;
-        private System.Windows.Forms.Button button3;
-        private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Label label_sensorID;
         private System.Windows.Forms.NumericUpDown numericUpDownSensorSelector;
     }

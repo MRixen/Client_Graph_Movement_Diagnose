@@ -48,13 +48,16 @@ namespace WindowsFormsApplication6
         private int DEFAULT_SAMPLE_TIME_FACTOR = Properties.Settings.Default.DEFAULT_SAMPLE_TIME_FACTOR;
         private int sensorIdToShow = -1;
 
-        public FormZ(Object context, int sensorID)
+        public delegate void ChartZExitEventHandler();
+        public event ChartZExitEventHandler chartZExitEventHandler;
+
+        public FormZ(Object context, int sampleTimeFactor)
         {
             InitializeComponent();
             formBaseContext = (FormDatabase)context;
 
-            if (sampleTimeFactor >= (DEFAULT_SAMPLE_TIME_FACTOR * 10)) this.sampleTimeFactor = sampleTimeFactor;
-            else this.sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR * 10;
+            if (sampleTimeFactor >= (DEFAULT_SAMPLE_TIME_FACTOR)) this.sampleTimeFactor = sampleTimeFactor;
+            else this.sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR;
             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
             this.sensorIdToShow = Convert.ToInt32(numericUpDownSensorSelector.Value);
             firtStart = false;
@@ -75,6 +78,8 @@ namespace WindowsFormsApplication6
 
         public void UpdateChartZ(string[] msg, string currentSensorID)
         {
+            Debug.Write("\n msg[3]Z: " + msg[3] + "msg[2]Z: " + msg[2] + "\n"); 
+            
             if (sensorIdToShow == Int32.Parse(currentSensorID))
             {
                 if (sampleStep == sampleTimeFactor)
@@ -122,6 +127,7 @@ namespace WindowsFormsApplication6
         {
             formBaseContext.setCheckboxUnchecked_Z = CheckState.Unchecked;
             if(notifyIcon != null) notifyIcon.Dispose();
+            chartZExitEventHandler();
         }
 
         private void Snapshot_Click(object sender, EventArgs e)

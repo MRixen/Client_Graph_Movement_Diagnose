@@ -43,14 +43,17 @@ namespace WindowsFormsApplication6
         private int DEFAULT_SAMPLE_TIME_FACTOR = Properties.Settings.Default.DEFAULT_SAMPLE_TIME_FACTOR;
         private int sensorIdToShow = -1;
 
+        public delegate void ChartXExitEventHandler();
+        public event ChartXExitEventHandler chartXExitEventHandler;
+
 
         public FormX(Object context, int sampleTimeFactor)
         {
             InitializeComponent();
             formBaseContext = (FormDatabase)context;
 
-            if (sampleTimeFactor >= (DEFAULT_SAMPLE_TIME_FACTOR * 10)) this.sampleTimeFactor = sampleTimeFactor;
-            else this.sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR * 10;
+            if (sampleTimeFactor >= (DEFAULT_SAMPLE_TIME_FACTOR)) this.sampleTimeFactor = sampleTimeFactor;
+            else this.sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR;
             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
             this.sensorIdToShow = Convert.ToInt32(numericUpDownSensorSelector.Value);
             firtStart = false;
@@ -76,6 +79,9 @@ namespace WindowsFormsApplication6
 
         public void UpdateChartX(string[] msg, string currentSensorID)
         {
+            Debug.Write("\n msg[3]X: " + msg[3] + "msg[2]X: " + msg[2] + "\n");
+            Debug.Write("\n sensorIdToShow: " + sensorIdToShow + "\n"); 
+
             if (sensorIdToShow == Int32.Parse(currentSensorID))
             {
                 if (sampleStep == sampleTimeFactor)
@@ -145,6 +151,7 @@ namespace WindowsFormsApplication6
         {
             formBaseContext.setCheckboxUnchecked_X = CheckState.Unchecked;
             if (notifyIcon != null) notifyIcon.Dispose();
+            chartXExitEventHandler();
         }
 
         private void numericUpDownSensorSelector_valueChanged(object sender, EventArgs e)
