@@ -51,6 +51,7 @@ namespace WindowsFormsApplication6
 
         public delegate void ChartYExitEventHandler();
         public event ChartYExitEventHandler chartYExitEventHandler;
+        private System.Timers.Timer chartTimer;
 
         public FormY(Object context, int sampleTimeFactor)
         {
@@ -62,7 +63,16 @@ namespace WindowsFormsApplication6
             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
             this.sensorIdToShow = Convert.ToInt32(numericUpDownSensorSelector.Value);
             firtStart = false;
-            notifyIcon = new NotifyIcon();    
+            notifyIcon = new NotifyIcon();
+            chartTimer = new System.Timers.Timer();
+            chartTimer.Elapsed += new System.Timers.ElapsedEventHandler(OnChartEvent);
+            chartTimer.Interval = sampleTimeFactor * DEFAULT_SAMPLE_TIME_FACTOR;
+            chartTimer.Enabled = true;
+        }
+
+        private void OnChartEvent(object sender, System.Timers.ElapsedEventArgs e)
+        {
+
         }
 
         public void setTitle(string name)
@@ -77,16 +87,13 @@ namespace WindowsFormsApplication6
             //textBox1.Text = text;
         }
 
-        public void UpdateChartY(string[] msg, string currentSensorID)
+        public void setNewChartDataY(string timestamp, string value, string currentSensorID)
         {
-
-            Debug.Write("\n sensorIdToShow: " + sensorIdToShow + "\n"); 
-
             if (sensorIdToShow == Int32.Parse(currentSensorID))
             {
                 if (sampleStep == sampleTimeFactor)
                 {
-                    setDataToGraph(msg);
+                    setDataToGraph(timestamp, value);
                     sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
                 }
                 else sampleStep++;
@@ -98,10 +105,8 @@ namespace WindowsFormsApplication6
             return chartY;
         }
 
-        private void setDataToGraph(String[] message)
+        private void setDataToGraph(string xAxisValue, string yAxisValue)
         {
-            //Debug.Write("message[1]: " + message[1] + "\n");
-
             var seriesY = chartY.Series[0];
             seriesY.ChartType = SeriesChartType.Line;
             chartY.Series[0].BorderWidth = 3;
@@ -113,22 +118,18 @@ namespace WindowsFormsApplication6
             chartY.ChartAreas[0].AxisY.Title = "Angle Y [deg]";
             chartY.ChartAreas[0].AxisX.MajorGrid.Interval = 1;
 
-            //stopWatch2.Start();
-
-            //if ((message[1] != messageOld) && ((stopWatch2.ElapsedMilliseconds) >= (stopWatchOld + (xAxisRate * 1000))))
-            //{
                 // Add data to graph (timestamp for y, sensor data for x)
-                seriesY.Points.AddXY(message[3], message[1]);
+                seriesY.Points.AddXY(xAxisValue, yAxisValue);
                 chartY.Invalidate();
-                //stopWatchOld = stopWatch2.ElapsedMilliseconds;
-            //}
-            //messageOld = message[1];
         }
 
         private void FormY_FormClosing(object sender, FormClosingEventArgs e)
         {
             formBaseContext.setCheckboxUnchecked_Y = CheckState.Unchecked;
             if(notifyIcon != null) notifyIcon.Dispose();
+
+            chartTimer.Stop();
+            chartTimer.Dispose();
             chartYExitEventHandler();
         }
 

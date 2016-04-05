@@ -103,6 +103,7 @@ namespace WindowsFormsApplication6
             this.numericUpDownSensorSelector.Name = "numericUpDownSensorSelector";
             this.numericUpDownSensorSelector.Size = new System.Drawing.Size(51, 20);
             this.numericUpDownSensorSelector.TabIndex = 12;
+            this.numericUpDownSensorSelector.ValueChanged += new System.EventHandler(this.numericUpDownSensorSelector_valueChanged);
             // 
             // label_sensorID
             // 

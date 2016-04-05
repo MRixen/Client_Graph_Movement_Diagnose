@@ -48,9 +48,7 @@ namespace WindowsFormsApplication6
         public DataSet createDatasetsForDb(string dBdescription)
         {
             // Create and open connection to specific database
-            Debug.Write("ConnectionString_DataBase:" + " ConnectionString_DataBase_" + dBdescription + "\n");
-            //System.Data.SqlClient.SqlConnection dataBase_connection = new System.Data.SqlClient.SqlConnection("ConnectionString_DataBase_" + dBdescription);
-            dataBase_connection = new System.Data.SqlClient.SqlConnection(Properties.Settings.Default.ConnectionString_DataBase_RightLeg);
+            dataBase_connection = new System.Data.SqlClient.SqlConnection(dBdescription);
             dataBase_connection.Open();
 
             // Copy content of database to dataset and close connection
@@ -89,7 +87,7 @@ namespace WindowsFormsApplication6
             return dataSet;
         }
 
-        public int[] getTableSizeForDb(int dBnumber)
+        public int[] getTableSizeForDb(DataSet dataSet)
         {
             maxTableRows = new int[DATABASE_SIZE];
             for (int i = 0; i < DATABASE_SIZE; i++)
@@ -99,8 +97,9 @@ namespace WindowsFormsApplication6
             return maxTableRows;
         }
 
-        public void deleteDatabaseContent()
+        public void deleteDatabaseContent(string dBdescription)
         {
+            dataBase_connection = new System.Data.SqlClient.SqlConnection(dBdescription);
             int MAX_TABLE_AMOUNT = Properties.Settings.Default.MAX_TABLE_AMOUNT;
             if (dataBase_connection != null)
             {

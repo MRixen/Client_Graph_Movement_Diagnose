@@ -29,7 +29,7 @@ namespace RBC
         public event MessageTunnelingHandler tunnelingMessage;
 
         public delegate void UpdateTextCallback(string text);
-        public delegate void UpdateChartCallback(string[] msg, string sensorID);
+        public delegate void UpdateChartCallback(string[] msg1, string msg3);
 
         String communicationName = "Unknown";
 
@@ -66,8 +66,8 @@ namespace RBC
 
         public bool clientInit()
         {
-            String ip = "192.168.1.4";
-            //String ip = "127.0.0.1";
+            //String ip = "192.168.1.3";
+            String ip = "127.0.0.1";
                 int port = 4555;
                 ipAddress = Dns.GetHostAddresses(ip);
 

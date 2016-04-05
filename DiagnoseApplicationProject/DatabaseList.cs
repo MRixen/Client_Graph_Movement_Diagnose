@@ -20,14 +20,16 @@ namespace WindowsFormsApplication6
         private int tableID;
         private System.ComponentModel.BackgroundWorker backgroundWorker_readDataset;
         private HelperFunctions helperFunctions;
+        private int databaseId;
 
-        public DatabaseList(FormDatabase context, DataSet dataSet, DatabaseConnection databaseConnection)
+        public DatabaseList(FormDatabase context, DataSet dataSet, DatabaseConnection databaseConnection, int databaseId)
         {
             InitializeComponent();
 
             this.formBaseContext = context;
             this.databaseConnection = databaseConnection;
-            this.dataSet = dataSet;            
+            this.dataSet = dataSet;
+            this.databaseId = databaseId;
             helperFunctions = new HelperFunctions();
 
             backgroundWorker_readDataset.DoWork += new DoWorkEventHandler(backgroundWorker_readDataset_DoWork);
@@ -35,6 +37,7 @@ namespace WindowsFormsApplication6
 
             this.tableID = Int32.Parse(numericUpDown_tableSelector.Text);
             helperFunctions.changeElementText(labelListEntries, "List entries: " + dataSet.Tables[tableID].Rows.Count.ToString());
+            helperFunctions.changeElementText(labelDatabaseId, "Database ID: " + databaseId);
         }
 
         private void backgroundWorker_readDataset_DoWork(object sender, DoWorkEventArgs e)
@@ -56,7 +59,7 @@ namespace WindowsFormsApplication6
         {
             if (dataSet != null)
             {
-                int[] maxTableRows = databaseConnection.getTableSizeForDb(1);
+                int[] maxTableRows = databaseConnection.getTableSizeForDb(dataSet);
 
                 for (int j = 0; j < maxTableRows[tableID]; j++)
                     {
@@ -78,8 +81,7 @@ namespace WindowsFormsApplication6
         }
 
         private void FormDatabase_Load(object sender, EventArgs e)
-        {
-            
+        {        
             backgroundWorker_readDataset.RunWorkerAsync();
         }
 

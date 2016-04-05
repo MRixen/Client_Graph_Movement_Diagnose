@@ -47,6 +47,8 @@ namespace WindowsFormsApplication6
         private int sampleStep;
         private int DEFAULT_SAMPLE_TIME_FACTOR = Properties.Settings.Default.DEFAULT_SAMPLE_TIME_FACTOR;
         private int sensorIdToShow = -1;
+        private System.Timers.Timer chartTimer;
+
 
         public delegate void ChartZExitEventHandler();
         public event ChartZExitEventHandler chartZExitEventHandler;
@@ -61,7 +63,16 @@ namespace WindowsFormsApplication6
             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
             this.sensorIdToShow = Convert.ToInt32(numericUpDownSensorSelector.Value);
             firtStart = false;
-            notifyIcon = new NotifyIcon();   
+            notifyIcon = new NotifyIcon();
+            chartTimer = new System.Timers.Timer();
+            chartTimer.Elapsed += new System.Timers.ElapsedEventHandler(OnChartEvent);
+            chartTimer.Interval = sampleTimeFactor * DEFAULT_SAMPLE_TIME_FACTOR;
+            chartTimer.Enabled = true;
+        }
+
+        private void OnChartEvent(object sender, System.Timers.ElapsedEventArgs e)
+        {
+
         }
 
         public void setTitle(string name)
@@ -76,15 +87,13 @@ namespace WindowsFormsApplication6
             //textBox1.Text = text;
         }
 
-        public void UpdateChartZ(string[] msg, string currentSensorID)
+        public void setNewChartDataZ(string timestamp, string value, string currentSensorID)
         {
-            Debug.Write("\n msg[3]Z: " + msg[3] + "msg[2]Z: " + msg[2] + "\n"); 
-            
             if (sensorIdToShow == Int32.Parse(currentSensorID))
             {
                 if (sampleStep == sampleTimeFactor)
                 {
-                    setDataToGraph(msg);
+                    setDataToGraph(timestamp, value);
                     sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
                 }
                 else sampleStep++;
@@ -96,10 +105,8 @@ namespace WindowsFormsApplication6
             return chartZ;
         }
 
-        private void setDataToGraph(String[] message)
+        private void setDataToGraph(string xAxisValue, string yAxisValue)
         {
-            //Debug.Write("message[1]: " + message[2] + "\n");
-
             var seriesZ = chartZ.Series[0];
             seriesZ.ChartType = SeriesChartType.Line;
             chartZ.Series[0].BorderWidth = 3;
@@ -111,22 +118,18 @@ namespace WindowsFormsApplication6
             chartZ.ChartAreas[0].AxisY.Title = "Angle Z [deg]";
             chartZ.ChartAreas[0].AxisX.MajorGrid.Interval = 1;
 
-            //stopWatch2.Start();
-
-            //if ((message[1] != messageOld) && ((stopWatch2.ElapsedMilliseconds) >= (stopWatchOld + (xAxisRate * 1000))))
-            //{
                 // Add data to graph (timestamp for y, sensor data for x)
-                seriesZ.Points.AddXY(message[3], message[2]);
+            seriesZ.Points.AddXY(xAxisValue, yAxisValue);
                 chartZ.Invalidate();
-                //stopWatchOld = stopWatch2.ElapsedMilliseconds;
-            //}
-            //messageOld = message[1];
         }
 
         private void FormZ_FormClosing(object sender, FormClosingEventArgs e)
         {
             formBaseContext.setCheckboxUnchecked_Z = CheckState.Unchecked;
             if(notifyIcon != null) notifyIcon.Dispose();
+
+            chartTimer.Stop();
+            chartTimer.Dispose();
             chartZExitEventHandler();
         }
 

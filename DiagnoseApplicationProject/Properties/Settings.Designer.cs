@@ -79,5 +79,25 @@ namespace WindowsFormsApplication6.Properties {
                 return ((int)(this["MAX_ALIVE_SIGNAL_PAUSE"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\\\Users\\\\Manuel.Rixen\\\\Desktop\\\\")]
+        public string FILE_SAVE_PATH {
+            get {
+                return ((string)(this["FILE_SAVE_PATH"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\v11.0;AttachDbFilename=\"C:\\Users\\Manuel.Rixen\\Documents\\Vis" +
+            "ual Studio 2013\\Projects\\DataBase\\DataBase\\Database2.mdf\";Integrated Security=Tr" +
+            "ue;Connect Timeout=30;User Instance=False")]
+        public string ConnectionString_DataBase_RightLeg_extracted {
+            get {
+                return ((string)(this["ConnectionString_DataBase_RightLeg_extracted"]));
+            }
+        }
     }
 }
