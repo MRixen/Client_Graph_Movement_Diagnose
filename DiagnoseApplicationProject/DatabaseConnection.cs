@@ -47,6 +47,7 @@ namespace WindowsFormsApplication6
 
         public DataSet createDatasetsForDb(string dBdescription)
         {
+            Debug.Write("dBdescription: " + dBdescription);
             // Create and open connection to specific database
             dataBase_connection = new System.Data.SqlClient.SqlConnection(dBdescription);
             dataBase_connection.Open();

@@ -172,6 +172,13 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="Resources\Database2.mdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <Content Include="Resources\Database2_log.ldf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <DependentUpon>Database2.mdf</DependentUpon>
+    </Content>
     <None Include="Resources\Database1.mdf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
