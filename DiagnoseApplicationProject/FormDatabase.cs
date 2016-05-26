@@ -60,13 +60,18 @@ namespace WindowsFormsApplication6
         private int aliveTimer;
         private Stopwatch aliveStopWatch = new Stopwatch();
 
+        GlobalDataSet globalDataSet;
+
 
         #region FORM
         public FormDatabase()
         {
             InitializeComponent();
 
-            helperFunctions = new HelperFunctions();
+            globalDataSet = new GlobalDataSet();
+            helperFunctions = new HelperFunctions(globalDataSet);
+
+            globalDataSet.DebugMode = false;
 
             backgroundWorker_CalculateRecordDuration.DoWork += new DoWorkEventHandler(backgroundWorker_CalculateRecordDuration_DoWork);
             backgroundWorker_CalculateRecordDuration.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_CalculateRecordDuration_RunWorkerCompleted);
@@ -358,7 +363,10 @@ namespace WindowsFormsApplication6
 
                         // Create message array from semicolon seperated text file 
                         String[] messageData = returnString.Split(';');
-                        if(readCounter > 0) writeToDb(messageData, i, dataSet_Db2);
+                        Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
+
+                        for (int j = 0; i < messageDataAsDecimal.Length; j++) messageDataAsDecimal[j] = Decimal.Parse(messageData[j], CultureInfo.InvariantCulture.NumberFormat) * 90;
+                        if (readCounter > 0) writeToDb(messageDataAsDecimal, i, dataSet_Db2);
                         readCounter++;
                     }
 
@@ -377,7 +385,7 @@ namespace WindowsFormsApplication6
         {
             // Get the BackgroundWorker that raised this event.
             BackgroundWorker worker = sender as BackgroundWorker;
-            databaseConnection = new DatabaseConnection();
+            databaseConnection = new DatabaseConnection(globalDataSet);
             DataSet[] dataSets = new DataSet[2];
 
             // Assign the result of the computation
@@ -529,6 +537,9 @@ namespace WindowsFormsApplication6
 
         private void closeApplication()
         {
+            // Stop timer to measure program execution
+            globalDataSet.Timer_programExecution.Stop();
+
             if (System.Windows.Forms.Application.MessageLoop)
             {
                 // WinForms app
@@ -547,15 +558,17 @@ namespace WindowsFormsApplication6
             return (maxSamples * (sampleTimeFactor * sampleTime)) / 60;
         }
 
-        private void writeToDb(String[] msgArray, int tableID, DataSet dataSet)
+        private void writeToDb(Decimal[] msgArray, int tableID, DataSet dataSet)
         {
             if (dataSet != null)
             {
                 DataRow row = dataSet.Tables[tableID].NewRow();
-                row[1] = float.Parse(msgArray[0], CultureInfo.InvariantCulture.NumberFormat);
-                row[2] = float.Parse(msgArray[1], CultureInfo.InvariantCulture.NumberFormat);
-                row[3] = float.Parse(msgArray[2], CultureInfo.InvariantCulture.NumberFormat);
-                row[4] = float.Parse(msgArray[3], CultureInfo.InvariantCulture.NumberFormat);
+
+                for (int i = 0; i < msgArray.Length; i++)
+                {
+                    Debug.WriteLine(msgArray[i]);
+                    row[i] = msgArray[i];
+                }
 
                 dataSet.Tables[tableID].Rows.Add(row);
 
@@ -592,7 +605,7 @@ namespace WindowsFormsApplication6
 
         private bool clientConnectionInit()
         {
-            tcpDiagnoseClient = new RBC.TcpIpCommunicationUnit("DiagnoseServer");
+            tcpDiagnoseClient = new RBC.TcpIpCommunicationUnit("DiagnoseServer", globalDataSet);
             //register the callbackevents from tcpservers
             tcpDiagnoseClient.messageReceivedEvent += new RBC.TcpIpCommunicationUnit.MessageReceivedEventHandler(tcpDiagnoseServer_messageReceivedEvent);
             tcpDiagnoseClient.errorEvent += new RBC.TcpIpCommunicationUnit.ErrorEventHandler(tcpPLCServer_errorEvent);
@@ -620,6 +633,8 @@ namespace WindowsFormsApplication6
             String message = receivedMessage[0];
             String sensor_joint_ID = receivedMessage[1];
 
+            if(globalDataSet.DebugMode) Debug.WriteLine("receivedMessage: " + receivedMessage[0]);
+
             aliveBit = true;
 
             // remove x, y, z character in message string
@@ -631,6 +646,11 @@ namespace WindowsFormsApplication6
             // Split message to x, y, z and timestamp value
             String[] messageData = message.Split(':');
 
+            // Convert message to float -> IMPORTANT: REMOVE THE NUMBER 40 WHEN THE CALCULATION IS CORRECTLY IMPLEMENTED HERE AND AT ANOTHER PLACE IN CODE (when read txt to db)
+            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
+            for (int i = 0; i < messageData.Length; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 90;
+            messageDataAsDecimal[3] = Math.Round((messageDataAsDecimal[3]/1000), 3, MidpointRounding.AwayFromZero);
+
             // Save to db
             if (recordIsActive)
             {
@@ -639,7 +659,7 @@ namespace WindowsFormsApplication6
                 {
                     if ((writeCycle < MAX_WRITE_CYCLE))
                     {
-                        if (!notExecuted) writeToDb(messageData, Int32.Parse(sensor_joint_ID), dataSet_Db1);
+                        if (!notExecuted) writeToDb(messageDataAsDecimal, Int32.Parse(sensor_joint_ID), dataSet_Db1);
                         if (Int32.Parse(sensor_joint_ID) == firstSensorId)
                         {
                             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
@@ -671,9 +691,10 @@ namespace WindowsFormsApplication6
                 }
             }
             // Show sensor values in graph
-            if ((checkBox_showGraphs.Checked) && (formCharts != null)) formCharts.setNewChartData(messageData, sensor_joint_ID);
+            if ((checkBox_showGraphs.Checked) && (formCharts != null)) formCharts.setNewChartData(messageDataAsDecimal, sensor_joint_ID);
 
             aliveBit = false;
+            Debug.WriteLine(globalDataSet.Timer_programExecution.ElapsedMilliseconds - globalDataSet.TimerValue);
         }
 
         //private void loadConfiguration()

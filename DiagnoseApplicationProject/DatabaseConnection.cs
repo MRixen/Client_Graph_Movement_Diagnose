@@ -17,6 +17,12 @@ namespace WindowsFormsApplication6
         private DataSet dataSet, dataSetX;
         private int[] maxTableRows;
         private System.Data.SqlClient.SqlConnection dataBase_connection;
+        private GlobalDataSet globalDataSet;
+
+        public DatabaseConnection(GlobalDataSet globalDataSet)
+        {
+            this.globalDataSet = globalDataSet;
+        }
 
         public void UpdateDatabase(System.Data.DataSet dataSet, int tableID)
         {
@@ -41,13 +47,13 @@ namespace WindowsFormsApplication6
                 dataAdapterX.Fill(dataSetX, "tbl_rl_j0");
             }
             catch(DBConcurrencyException e){
-                Debug.Write("Exception in UpdateDatabase():" + e);
+                if(globalDataSet.DebugMode) Debug.Write("Exception in UpdateDatabase():" + e);
             }
         }
 
         public DataSet createDatasetsForDb(string dBdescription)
         {
-            Debug.Write("dBdescription: " + dBdescription);
+            if(globalDataSet.DebugMode) Debug.Write("dBdescription: " + dBdescription);
             // Create and open connection to specific database
             dataBase_connection = new System.Data.SqlClient.SqlConnection(dBdescription);
             dataBase_connection.Open();

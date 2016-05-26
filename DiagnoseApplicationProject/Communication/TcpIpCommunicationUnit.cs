@@ -41,7 +41,6 @@ namespace RBC
 
         public String configfilename = "";
         public NetworkConfig networkConfig = null;
-        public RBC.Configuration dllConfiguration = null;
         public bool newDataAvailable = false;
 
         Dictionary<string, TcpClient> clientList = new Dictionary<string, TcpClient>();
@@ -55,9 +54,11 @@ namespace RBC
         private IPAddress[] ipAddress;
         private TcpClient tcpClient = new TcpClient();
         private NetworkStream networkStream;
+        private GlobalDataSet globalDataSet;
 
-        public TcpIpCommunicationUnit(String pCommunicationName)
+        public TcpIpCommunicationUnit(String pCommunicationName, GlobalDataSet globalDataSet)
         {
+            this.globalDataSet = globalDataSet;
             this.communicationName = pCommunicationName;
             this.configfilename = pCommunicationName + "_NetworkConfig.xml";
             this.loadNetworkConfiguration();
@@ -66,54 +67,56 @@ namespace RBC
 
         public bool clientInit()
         {
-            //String ip = "192.168.1.4";
-            String ip = "127.0.0.1";
-                int port = 4555;
-                ipAddress = Dns.GetHostAddresses(ip);
+            String ip = "192.168.1.4";
+            //String ip = "127.0.0.1";
+            int port = 4555;
+            ipAddress = Dns.GetHostAddresses(ip);
 
-                try
+            try
+            {
+                if (globalDataSet.DebugMode) Debug.Write("Start client" + "\n");
+                tcpClient.Connect(ip, port);
+
+                networkStream = tcpClient.GetStream();
+
+
+                if (tcpClient.Connected)
                 {
-                    Debug.Write("Start client" + "\n");
-                    tcpClient.Connect(ip, port);
-                    
-                    networkStream = tcpClient.GetStream();
+                    globalDataSet.Timer_programExecution.Start();
+                    globalDataSet.TimerValue = globalDataSet.Timer_programExecution.ElapsedMilliseconds;
+                    if (globalDataSet.DebugMode) Debug.Write("Connected" + "\n");
+                    startReceiverThread();
+                    // Start server
+                    // this.tcpserver = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Parse(this.networkConfig.ipAddress), this.networkConfig.port);
+                    // this.tcpserver.Start();
 
+                    // Start thread to listening for new clients
+                    // this.clientListenerThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientListener));
+                    // this.clientListenerThread.Start();
 
-                    if (tcpClient.Connected)
-                    {
-                        Debug.Write("Connected" + "\n");
-                        startReceiverThread();
-                        // Start server
-                        // this.tcpserver = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Parse(this.networkConfig.ipAddress), this.networkConfig.port);
-                        // this.tcpserver.Start();
+                    // Start thread to listening on removed clients
+                    //this.clientRemoverThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientRemover));
+                    // this.clientRemoverThread.Start();
 
-                        // Start thread to listening for new clients
-                        // this.clientListenerThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientListener));
-                        // this.clientListenerThread.Start();
-
-                        // Start thread to listening on removed clients
-                        //this.clientRemoverThread = new System.Threading.Thread(new System.Threading.ThreadStart(clientRemover));
-                        // this.clientRemoverThread.Start();
-
-                        //if (this.statusChangedEvent != null)
-                        //    this.statusChangedEvent(this.communicationName + ": Server started. Listening for Clients at Port - " + this.networkConfig.port);
-                        return true;
-                    }
-                    else
-                    {
-                        Debug.Write("Client not connected" + "\n");
-                        return false;
-                    }
+                    //if (this.statusChangedEvent != null)
+                    //    this.statusChangedEvent(this.communicationName + ": Server started. Listening for Clients at Port - " + this.networkConfig.port);
+                    return true;
+                }
+                else
+                {
+                    if (globalDataSet.DebugMode) Debug.Write("Client not connected" + "\n");
+                    return false;
+                }
 
             }
             catch (System.Net.Sockets.SocketException ex)
             {
-                Debug.Write("Error in clientServerInit: " + ex);
+                if (globalDataSet.DebugMode) Debug.Write("Error in clientServerInit: " + ex);
                 return false;
             }
         }
 
-       // public void clientListener()
+        // public void clientListener()
         public void startReceiverThread()
         {
             // Create threads for robot controller and phones
@@ -122,51 +125,51 @@ namespace RBC
             //phoneClientCounter = 0;
             //while (this.shutDown_clientListener == false)
             //{
-            //    Debug.Write("Listening for new clients" + "\n");
+            //    if(globalDataSet.DebugMode) Debug.Write("Listening for new clients" + "\n");
             //    // Listening for new client               
             //    TcpClient tcpClientTemp = tcpserver.AcceptTcpClient();
 
             //    // Receive name of client and add client to dictonary
             //    // If name already exist create another one
             //    string clientName = receiveClientName(tcpClientTemp);
-            //    Debug.Write("clientName: " + clientName + "\n");
+            //    if(globalDataSet.DebugMode) Debug.Write("clientName: " + clientName + "\n");
 
             //    if (clientName.Equals("Phone"))
             //    {
             //        // Send answer to client that clientname is received
-            //        Debug.Write("Send handshake to phone" + "\n");
+            //        if(globalDataSet.DebugMode) Debug.Write("Send handshake to phone" + "\n");
             //        sendToClient(":p:1;", tcpClientTemp);
 
             //        // Modify client name from "phone" to "phoneX" i.e. "phone1", "phone2", etc.
             //        clientName = clientName + phoneClientCounter.ToString();
-            //        Debug.Write("clientName modified: " + clientName + "\n");
+            //        if(globalDataSet.DebugMode) Debug.Write("clientName modified: " + clientName + "\n");
             //        clientList.Add(clientName, tcpClientTemp);
             //        phoneClientCounter += 1;
             //    }
             //    if (clientName.Equals("RobotController"))
             //    {
             //        // Send answer to client that clientname is received
-            //        Debug.Write("Send handshake to robot controller" + "\n");
+            //        if(globalDataSet.DebugMode) Debug.Write("Send handshake to robot controller" + "\n");
             //        sendToClient(":p:1;", tcpClientTemp);
 
             //        // Add name to dictonary
             //        clientList.Add(clientName, tcpClientTemp);
             //    }
 
-                // Start new thread for robot controller
-                //if (clientList.ContainsKey("RobotController") && !(this.clientRobotControllerThread.ThreadState == System.Threading.ThreadState.Running))
-            if(!(this.clientRobotControllerThread.ThreadState == System.Threading.ThreadState.Running))    
+            // Start new thread for robot controller
+            //if (clientList.ContainsKey("RobotController") && !(this.clientRobotControllerThread.ThreadState == System.Threading.ThreadState.Running))
+            if (!(this.clientRobotControllerThread.ThreadState == System.Threading.ThreadState.Running))
             {
-                    this.clientRobotControllerThread.Start();
-                    Debug.Write("clientRobotControllerThread started" + "\n");
-                }
+                this.clientRobotControllerThread.Start();
+                if (globalDataSet.DebugMode) Debug.Write("clientRobotControllerThread started" + "\n");
+            }
 
-                // Start new thread for phones
-                //if (clientList.ContainsKey("Phone") && !(this.clientPhoneThread.ThreadState == System.Threading.ThreadState.Running))
-                //{
-                    //Debug.Write("clientPhoneThread started" + "\n");
-                    //this.clientPhoneThread.Start();
-                // }
+            // Start new thread for phones
+            //if (clientList.ContainsKey("Phone") && !(this.clientPhoneThread.ThreadState == System.Threading.ThreadState.Running))
+            //{
+            //if(globalDataSet.DebugMode) Debug.Write("clientPhoneThread started" + "\n");
+            //this.clientPhoneThread.Start();
+            // }
             //}
 
             if (this.statusChangedEvent != null)
@@ -207,7 +210,7 @@ namespace RBC
             String clientName = "";
             bool isRunning = true;
 
-            Debug.Write("Receive name of client" + "\n");
+            if (globalDataSet.DebugMode) Debug.Write("Receive name of client" + "\n");
             while (isRunning)
             {
                 try
@@ -221,7 +224,7 @@ namespace RBC
                     {
                         if (!incomingMessage.Equals(";"))
                         {
-                            Debug.Write("Name: " + clientName + "\n");
+                            if (globalDataSet.DebugMode) Debug.Write("Name: " + clientName + "\n");
                             clientName += incomingMessage;
                         }
                         else
@@ -234,7 +237,7 @@ namespace RBC
                 catch (System.IO.IOException ex)
                 {
                     isRunning = false;
-                    Debug.Write("Error in receiveClientName: " + ex);
+                    if (globalDataSet.DebugMode) Debug.Write("Error in receiveClientName: " + ex);
                     return "";
                 }
             }
@@ -246,10 +249,10 @@ namespace RBC
             TcpClient tcpClientPhone;
 
             // TODO: Maybe do this in another thread
-            Debug.Write("Message for phone: " + msg);
-            for (int i = 0; i <= phoneClientCounter-1; i++)
+            if (globalDataSet.DebugMode) Debug.Write("Message for phone: " + msg);
+            for (int i = 0; i <= phoneClientCounter - 1; i++)
             {
-                Debug.Write("Send to client: " + i.ToString() + "\n");
+                if (globalDataSet.DebugMode) Debug.Write("Send to client: " + i.ToString() + "\n");
                 clientList.TryGetValue("Phone" + i.ToString(), out tcpClientPhone);
                 sendToClient(msg, tcpClientPhone);
             }
@@ -283,7 +286,7 @@ namespace RBC
             {
                 try
                 {
-                    //Debug.Write("Received from server: " + incomingMessage + "\n");
+                    //if(globalDataSet.DebugMode) Debug.Write("Received from server: " + incomingMessage + "\n");
                     int data = ns.Read(buffer, 0, 1);
                     incomingMessage = System.Text.Encoding.ASCII.GetString(buffer, 0, data);
 
@@ -328,7 +331,7 @@ namespace RBC
                             //if (this.tunnelingMessage != null) this.tunnelingMessage(incomingMessageTemp);
                             // Test to use one thread for tunneling to client and to filtering...
                             //sendToPhone(incomingMessageTemp);
-                            //Debug.Write("Message received: " + incomingMessageTemp + "\n");
+                            //if(globalDataSet.DebugMode) Debug.Write("Message received: " + incomingMessageTemp + "\n");
                             msgArray = new String[] { "", "" };
                             incomingMessageTemp = "";
                         }
@@ -401,12 +404,10 @@ namespace RBC
             //if there is no data available clean it up
             this.networkConfig = new NetworkConfig();
             //this.networkConfig.ipAddress = "192.168.1.3";
-             this.networkConfig.ipAddress = "0.0.0.0";
+            this.networkConfig.ipAddress = "0.0.0.0";
             this.networkConfig.port = 4555;
             //save the stadardconfig
             this.saveNetworkConfiguration();
-            this.dllConfiguration = new RBC.Configuration();
-            this.dllConfiguration.debuggingActive = false;
 
             //}
         }
@@ -423,11 +424,11 @@ namespace RBC
                 System.Net.Sockets.NetworkStream ns = tcpClient.GetStream();
                 byte[] sendbuffer = System.Text.Encoding.ASCII.GetBytes(msg);
                 ns.Write(sendbuffer, 0, sendbuffer.Length);
-                //Debug.Write("To phone: " + msg + "\n");
+                //if(globalDataSet.DebugMode) Debug.Write("To phone: " + msg + "\n");
             }
             catch (Exception ex)
             {
-                Debug.Write("Error in sendToSmartphone: " + ex);
+                if (globalDataSet.DebugMode) Debug.Write("Error in sendToSmartphone: " + ex);
             }
         }
     }

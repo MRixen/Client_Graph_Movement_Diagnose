@@ -12,7 +12,7 @@ using System.Windows.Threading;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.Drawing.Imaging;
 using System.Xml;
-
+using ScreenShotDemo;
 
 namespace WindowsFormsApplication6
 {
@@ -44,7 +44,7 @@ namespace WindowsFormsApplication6
         public delegate void ChartsExitEventHandler();
         public event ChartsExitEventHandler chartsExitEventHandler;
         private Timer chartTimer;
-        private string[] chartData = new string[] {"", "", "", ""};
+        private Decimal[] chartData = new Decimal[] { -9999, -9999, -9999, -9999 };
         private Series[] chartSeries = new Series[6];
         private Series[] chartSeriesTest = new Series[3];
         private Chart[] charts = new Chart[4];
@@ -82,9 +82,9 @@ namespace WindowsFormsApplication6
                 chartSeries[i].ChartType = SeriesChartType.Line;
                 charts[i].Series[0].BorderWidth = 3;
                 charts[i].Series[0].Color = graphLineColors[i];
-                charts[i].ChartAreas[0].AxisY.Interval = 5;
-                charts[i].ChartAreas[0].AxisY.Minimum = -60;
-                charts[i].ChartAreas[0].AxisY.Maximum = 60;
+                charts[i].ChartAreas[0].AxisY.Interval = 10;
+                charts[i].ChartAreas[0].AxisY.Minimum = -100;
+                charts[i].ChartAreas[0].AxisY.Maximum = 100;
                 charts[i].ChartAreas[0].AxisX.Interval = 1; 
                 charts[i].ChartAreas[0].AxisX.Title = "Timestamp [ms]";
                 charts[i].ChartAreas[0].AxisY.Title = "Angle " + chartXaxisLabel[i] + " [deg]";
@@ -103,10 +103,11 @@ namespace WindowsFormsApplication6
 
         private void OnChartEvent(object sender, EventArgs e)
         {
-            if ((chartData[0].Length > 0))
+            
+            if ((chartData[0] != -9999) && (chartData[1] != -9999) && (chartData[2] != -9999) && (chartData[3] != -9999))
             {
                 setDataToGraph(chartData);
-                for (int i = 0; i < chartData.Length; i++) chartData[i] = "";
+                for (int i = 0; i < chartData.Length; i++) chartData[i] = -9999;
             } 
         }
 
@@ -117,7 +118,7 @@ namespace WindowsFormsApplication6
             //title.Font = new System.Drawing.Font("Arial", 16, FontStyle.Bold);           
         }
 
-        public void setNewChartData(string[] message, string currentSensorID)
+        public void setNewChartData(Decimal[] message, string currentSensorID)
         {
             if (sensorIdToShow == Int32.Parse(currentSensorID))
             {
@@ -126,11 +127,14 @@ namespace WindowsFormsApplication6
                     this.chartData = message;
                     sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
                 }
-                else sampleStep++;
+                else
+                {
+                    sampleStep++;
+                }
             }
         }
 
-        private void setDataToGraph(string[] chartData)
+        private void setDataToGraph(Decimal[] chartData)
         {
 
             chartX.ChartAreas[0].AxisX.Title = "Timestamp [ms]";
@@ -163,19 +167,14 @@ namespace WindowsFormsApplication6
 
         private void Snapshot_Click(object sender, EventArgs e)
         {
-            Rectangle bounds = this.Bounds;
-            using (Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height))
-            {
-                using (Graphics g = Graphics.FromImage(bitmap))
-                {
-                    g.CopyFromScreen(new Point(bounds.Left, bounds.Top), Point.Empty, bounds.Size);
-                }
-                bitmap.Save(FILE_SAVE_PATH + graphName + ".jpg", ImageFormat.Jpeg);
-            }
+            ScreenCapture sc = new ScreenCapture();
 
-
-
-            
+            // capture entire screen, and save it to a file
+            Image img = sc.CaptureScreen();
+       
+            // capture this window, and save it
+            sc.CaptureWindowToFile(this.Handle, FILE_SAVE_PATH + graphName + ".png", ImageFormat.Png);
+         
             notifyIcon.Visible = true;
 
             notifyIcon.BalloonTipTitle = "Movement Diagnose Data";

@@ -11,6 +11,16 @@ namespace WindowsFormsApplication6
     {
         String elementText = "";
         int elementTextInt = 0;
+        private GlobalDataSet globalDataSet;
+
+        public HelperFunctions(GlobalDataSet globalDataSet)
+        {
+            this.globalDataSet = globalDataSet;
+        }
+
+        public HelperFunctions()
+        {
+        }
 
         public void changeElementText(object element, String text)
         {
