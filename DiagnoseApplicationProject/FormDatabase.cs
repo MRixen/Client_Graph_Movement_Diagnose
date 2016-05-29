@@ -563,12 +563,8 @@ namespace WindowsFormsApplication6
             if (dataSet != null)
             {
                 DataRow row = dataSet.Tables[tableID].NewRow();
-
-                for (int i = 0; i < msgArray.Length; i++)
-                {
-                    Debug.WriteLine(msgArray[i]);
-                    row[i] = msgArray[i];
-                }
+       
+                for (int i = 0; i < msgArray.Length; i++) row[i+1] = msgArray[i];
 
                 dataSet.Tables[tableID].Rows.Add(row);
 
@@ -694,7 +690,7 @@ namespace WindowsFormsApplication6
             if ((checkBox_showGraphs.Checked) && (formCharts != null)) formCharts.setNewChartData(messageDataAsDecimal, sensor_joint_ID);
 
             aliveBit = false;
-            Debug.WriteLine(globalDataSet.Timer_programExecution.ElapsedMilliseconds - globalDataSet.TimerValue);
+            //Debug.WriteLine(globalDataSet.Timer_programExecution.ElapsedMilliseconds - globalDataSet.TimerValue);
         }
 
         //private void loadConfiguration()
