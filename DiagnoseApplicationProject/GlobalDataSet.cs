@@ -12,6 +12,7 @@ namespace WindowsFormsApplication6
         private long timerValue;
         private bool debugMode;
         private Stopwatch timer_programExecution = new Stopwatch();
+        private bool showProgramDuration;
 
         public bool DebugMode
         {
@@ -49,6 +50,19 @@ namespace WindowsFormsApplication6
             set
             {
                 timerValue = value;
+            }
+        }
+
+        internal bool ShowProgramDuration
+        {
+            get
+            {
+                return showProgramDuration;
+            }
+
+            set
+            {
+                showProgramDuration = value;
             }
         }
     }

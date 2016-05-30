@@ -82,8 +82,12 @@ namespace RBC
 
                 if (tcpClient.Connected)
                 {
-                    globalDataSet.Timer_programExecution.Start();
-                    globalDataSet.TimerValue = globalDataSet.Timer_programExecution.ElapsedMilliseconds;
+                    if (globalDataSet.ShowProgramDuration)
+                    {
+                        globalDataSet.Timer_programExecution.Start();
+                        globalDataSet.TimerValue = globalDataSet.Timer_programExecution.ElapsedMilliseconds;
+                    }
+
                     if (globalDataSet.DebugMode) Debug.Write("Connected" + "\n");
                     startReceiverThread();
                     // Start server

@@ -62,6 +62,10 @@ namespace WindowsFormsApplication6
 
         GlobalDataSet globalDataSet;
 
+        long timeStamp_startTime;
+        Stopwatch timer_timeStamp = new Stopwatch();
+        private bool notInUseByGraph, notInUseByDatabase;
+
 
         #region FORM
         public FormDatabase()
@@ -72,6 +76,7 @@ namespace WindowsFormsApplication6
             helperFunctions = new HelperFunctions(globalDataSet);
 
             globalDataSet.DebugMode = false;
+            globalDataSet.ShowProgramDuration = false;
 
             backgroundWorker_CalculateRecordDuration.DoWork += new DoWorkEventHandler(backgroundWorker_CalculateRecordDuration_DoWork);
             backgroundWorker_CalculateRecordDuration.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_CalculateRecordDuration_RunWorkerCompleted);
@@ -92,6 +97,8 @@ namespace WindowsFormsApplication6
 
 
             // Initialize
+            notInUseByGraph = true;
+            notInUseByDatabase = true;
             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
             aliveBit = false;
             recordIsActive = false;
@@ -233,16 +240,24 @@ namespace WindowsFormsApplication6
                 // Show dialog to warn user and clear database
                 if (MessageBox.Show("Delete database content?", "Database re-initialization", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
                 {
+                    // Start timer to get timestamps
+                    notInUseByDatabase = false;
+                    if (!timer_timeStamp.IsRunning) startTimerTimestamp();
+
+                    // Delete old database content
                     backgroundWorker_DeleteDb.RunWorkerAsync();
                 }
                 else
                 {
                     // Do nothing
                 }
-
             }
             else
             {
+                // Stop timer and indicate that we didnt use it here
+                if (timer_timeStamp.IsRunning && notInUseByGraph) timer_timeStamp.Stop();
+                notInUseByDatabase = true;
+
                 sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
                 recordIsActive = false;
                 savedRowCounter = 0;
@@ -255,6 +270,13 @@ namespace WindowsFormsApplication6
                 helperFunctions.changeElementEnable(button_exportToTxt, true);
                 helperFunctions.changeElementText(button_recordToDb, "Record to db");
             }
+        }
+
+        private void startTimerTimestamp()
+        {
+            timer_timeStamp.Reset();
+            timer_timeStamp.Start();
+            timeStamp_startTime = timer_timeStamp.ElapsedMilliseconds;
         }
 
         public CheckState setCheckboxUnchecked_DbList
@@ -538,7 +560,7 @@ namespace WindowsFormsApplication6
         private void closeApplication()
         {
             // Stop timer to measure program execution
-            globalDataSet.Timer_programExecution.Stop();
+            if (globalDataSet.ShowProgramDuration) globalDataSet.Timer_programExecution.Stop();
 
             if (System.Windows.Forms.Application.MessageLoop)
             {
@@ -643,8 +665,11 @@ namespace WindowsFormsApplication6
             String[] messageData = message.Split(':');
 
             // Convert message to float -> IMPORTANT: REMOVE THE NUMBER 40 WHEN THE CALCULATION IS CORRECTLY IMPLEMENTED HERE AND AT ANOTHER PLACE IN CODE (when read txt to db)
-            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
+            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length+1];
             for (int i = 0; i < messageData.Length; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 90;
+
+            // Generate timestamp
+            messageDataAsDecimal[3] = timer_timeStamp.ElapsedMilliseconds - timeStamp_startTime;
             messageDataAsDecimal[3] = Math.Round((messageDataAsDecimal[3]/1000), 3, MidpointRounding.AwayFromZero);
 
             // Save to db
@@ -687,10 +712,20 @@ namespace WindowsFormsApplication6
                 }
             }
             // Show sensor values in graph
-            if ((checkBox_showGraphs.Checked) && (formCharts != null)) formCharts.setNewChartData(messageDataAsDecimal, sensor_joint_ID);
+            if ((checkBox_showGraphs.Checked) && (formCharts != null))
+            {
+                // Start timer to get timestamps
+                notInUseByGraph = false;
+                if (!timer_timeStamp.IsRunning) startTimerTimestamp();
+
+                formCharts.setNewChartData(messageDataAsDecimal, sensor_joint_ID);
+            }
+            // Stop timer and indicate that we didnt use it here     
+            else if (timer_timeStamp.IsRunning && notInUseByDatabase) timer_timeStamp.Stop();
+            notInUseByGraph = true;
 
             aliveBit = false;
-            //Debug.WriteLine(globalDataSet.Timer_programExecution.ElapsedMilliseconds - globalDataSet.TimerValue);
+            if(globalDataSet.ShowProgramDuration) Debug.WriteLine(globalDataSet.Timer_programExecution.ElapsedMilliseconds - globalDataSet.TimerValue);
         }
 
         //private void loadConfiguration()
