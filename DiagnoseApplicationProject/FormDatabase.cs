@@ -341,7 +341,10 @@ namespace WindowsFormsApplication6
 
             for (int i = 0; i < maxTableRows.Length; i++)
             {
-                string fileName = "table_" + i + ".txt";
+                string fileName;
+                if (textBox_context.Text != "") fileName = textBox_context.Text + "_" + i + ".txt";
+                else fileName = "noname_" + i + ".txt";
+
                 using (StreamWriter writer = new StreamWriter(FILE_SAVE_PATH + fileName, false))
                 {
                     writer.WriteLine(header);
