@@ -675,6 +675,8 @@ namespace WindowsFormsApplication6
             messageDataAsDecimal[3] = timer_timeStamp.ElapsedMilliseconds - timeStamp_startTime;
             messageDataAsDecimal[3] = Math.Round((messageDataAsDecimal[3]/1000), 3, MidpointRounding.AwayFromZero);
 
+            Debug.WriteLine("messageDataAsDecimal[3]: " + messageDataAsDecimal[3]);
+
             // Save to db
             if (recordIsActive)
             {

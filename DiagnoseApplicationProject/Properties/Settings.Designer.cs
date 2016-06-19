@@ -80,24 +80,24 @@ namespace WindowsFormsApplication6.Properties {
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\Manuel.Rixen\\Source\\" +
-            "Repos\\DataBase\\DataBase\\Database1.mdf;Integrated Security=True;Connect Timeout=3" +
-            "0")]
-        public string ConnectionString_DataBase_RightLeg {
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\Manuel.Rixen\\Documen" +
+            "ts\\GitHub\\DataBase\\DataBase\\Database2.mdf;Initial Catalog=Database1;Integrated S" +
+            "ecurity=True")]
+        public string ConnectionString_DataBase_RightLeg_extracted {
             get {
-                return ((string)(this["ConnectionString_DataBase_RightLeg"]));
+                return ((string)(this["ConnectionString_DataBase_RightLeg_extracted"]));
             }
         }
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
-        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\Manuel.Rixen\\Source\\" +
-            "Repos\\DataBase\\DataBase\\Database2.mdf;Integrated Security=True;Connect Timeout=3" +
-            "0")]
-        public string ConnectionString_DataBase_RightLeg_extracted {
+        [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\Manuel.Rixen\\Documen" +
+            "ts\\GitHub\\DataBase\\DataBase\\Database2.mdf;Initial Catalog=Database1;Integrated S" +
+            "ecurity=True")]
+        public string ConnectionString_DataBase_RightLeg {
             get {
-                return ((string)(this["ConnectionString_DataBase_RightLeg_extracted"]));
+                return ((string)(this["ConnectionString_DataBase_RightLeg"]));
             }
         }
     }
