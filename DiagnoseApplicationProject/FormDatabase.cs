@@ -245,6 +245,7 @@ namespace WindowsFormsApplication6
                     if (!timer_timeStamp.IsRunning) startTimerTimestamp();
 
                     // Delete old database content
+                    labelSavedRows.Text = "";
                     backgroundWorker_DeleteDb.RunWorkerAsync();
                 }
                 else
@@ -314,9 +315,10 @@ namespace WindowsFormsApplication6
 
         private void backgroundWorker_DeleteDb_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            helperFunctions.changeElementText(labelSavedRows, "");
-            // Show duration of measurment
+            //helperFunctions.changeElementText(labelSavedRows, "");
+            // Show duration of measurement
             MAX_WRITE_CYCLE = Int32.Parse(textBox_maxSamples.Text);
+            Debug.WriteLine("MAX_WRITE_CYCLE: " + MAX_WRITE_CYCLE);
             recordIsActive = true;
             helperFunctions.changeElementText(button_recordToDb, "Stop recording");
             helperFunctions.changeElementEnable(textBox_maxSamples, false);
@@ -668,14 +670,13 @@ namespace WindowsFormsApplication6
             String[] messageData = message.Split(':');
 
             // Convert message to float -> IMPORTANT: REMOVE THE NUMBER 40 WHEN THE CALCULATION IS CORRECTLY IMPLEMENTED HERE AND AT ANOTHER PLACE IN CODE (when read txt to db)
-            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length+1];
-            for (int i = 0; i < messageData.Length; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 90;
+            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
+            for (int i = 0; i < messageDataAsDecimal.Length-1; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 20;
 
-            // Generate timestamp
-            messageDataAsDecimal[3] = timer_timeStamp.ElapsedMilliseconds - timeStamp_startTime;
-            messageDataAsDecimal[3] = Math.Round((messageDataAsDecimal[3]/1000), 3, MidpointRounding.AwayFromZero);
+            // Get timestamp
+            messageDataAsDecimal[3] = Decimal.Parse(messageData[3], CultureInfo.InvariantCulture.NumberFormat);
 
-            Debug.WriteLine("messageDataAsDecimal[3]: " + messageDataAsDecimal[3]);
+            //Debug.WriteLine("messageDataAsDecimal[3]: " + messageDataAsDecimal[3]);
 
             // Save to db
             if (recordIsActive)

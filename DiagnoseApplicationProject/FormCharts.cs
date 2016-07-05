@@ -50,6 +50,8 @@ namespace WindowsFormsApplication6
         private Chart[] charts = new Chart[4];
         private string[] chartXaxisLabel = new string[] { "X", "Y", "Z", "XYZ" };
         private Color[] graphLineColors = new Color[] { Color.Blue, Color.Orange, Color.Green, Color.Blue, Color.Orange, Color.Green };
+        private int dataCounter;
+        private Decimal[][] chartDataCont = new Decimal[100][];
 
         public FormCharts(Object context, int sampleTimeFactor)
         {
@@ -65,8 +67,11 @@ namespace WindowsFormsApplication6
             notifyIcon = new NotifyIcon();
             chartTimer = new Timer();
             chartTimer.Tick += new EventHandler(OnChartEvent);
-            chartTimer.Interval = (int) (DEFAULT_SAMPLE_TIME*500); // sample time needs to be less than the default (fast collector and slow sender)
+            //chartTimer.Interval = (int)(DEFAULT_SAMPLE_TIME * 500); // sample time needs to be less than the default (fast collector and slow sender)
+            //chartTimer.Interval = 1; // sample time needs to be less than the default (fast collector and slow sender)
             chartTimer.Start();
+
+            dataCounter = 0;
         }
 
         private void initCharts()
@@ -80,12 +85,12 @@ namespace WindowsFormsApplication6
             {
                 chartSeries[i] = charts[i].Series[0];
                 chartSeries[i].ChartType = SeriesChartType.Line;
+                chartSeries[i].IsXValueIndexed = false;
                 charts[i].Series[0].BorderWidth = 3;
                 charts[i].Series[0].Color = graphLineColors[i];
                 charts[i].ChartAreas[0].AxisY.Interval = 10;
                 charts[i].ChartAreas[0].AxisY.Minimum = -100;
                 charts[i].ChartAreas[0].AxisY.Maximum = 100;
-                charts[i].ChartAreas[0].AxisX.Interval = 1; 
                 charts[i].ChartAreas[0].AxisX.Title = "Timestamp [ms]";
                 charts[i].ChartAreas[0].AxisY.Title = "Angle " + chartXaxisLabel[i] + " [deg]";
                 charts[i].ChartAreas[0].AxisY.MajorGrid.Interval = 5;
@@ -106,8 +111,14 @@ namespace WindowsFormsApplication6
             
             if ((chartData[0] != -9999) && (chartData[1] != -9999) && (chartData[2] != -9999) && (chartData[3] != -9999))
             {
-                setDataToGraph(chartData);
-                for (int i = 0; i < chartData.Length; i++) chartData[i] = -9999;
+
+                    //if (((dataCounter > 0) && ((Decimal)chartDataCont[dataCounter - 1].GetValue(3) != chartData[3])) || (dataCounter == 0))
+                    //{
+                        //chartDataCont[dataCounter] = chartData;
+                        setDataToGraph(chartData);
+                        dataCounter++;
+                    //}
+                
             } 
         }
 
@@ -122,22 +133,21 @@ namespace WindowsFormsApplication6
         {
             if (sensorIdToShow == Int32.Parse(currentSensorID))
             {
-                if (sampleStep == sampleTimeFactor)
-                {
-                    this.chartData = message;
-                    sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
-                }
-                else
-                {
-                    sampleStep++;
-                }
+                //if (sampleStep == sampleTimeFactor)
+                //{
+                this.chartData = message;
+                //    sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
+                //}
+                //else
+                //{
+                //    sampleStep++;
+                //}
             }
         }
 
         private void setDataToGraph(Decimal[] chartData)
         {
-
-            chartX.ChartAreas[0].AxisX.Title = "Timestamp [ms]";
+                        chartX.ChartAreas[0].AxisX.Title = "Timestamp [ms]";
             chartX.ChartAreas[0].AxisY.Title = "Angle " + chartXaxisLabel[0] + " [deg]";
 
             chartY.ChartAreas[0].AxisX.Title = "Timestamp [ms]";
@@ -149,6 +159,7 @@ namespace WindowsFormsApplication6
             chartXYZ.ChartAreas[0].AxisX.Title = "Timestamp [ms]";
             chartXYZ.ChartAreas[0].AxisY.Title = "Angle " + chartXaxisLabel[3] + " [deg]";
 
+
             // Add data to graph (timestamp for y, sensor data for x)
             chartSeries[0].Points.AddXY(chartData[3], chartData[0]);
             chartX.Invalidate();
@@ -159,10 +170,12 @@ namespace WindowsFormsApplication6
             chartSeries[2].Points.AddXY(chartData[3], chartData[2]);
             chartZ.Invalidate();
 
-            chartSeries[3].Points.AddXY(chartData[3], chartData[0]);
-            chartSeries[4].Points.AddXY(chartData[3], chartData[1]);
-            chartSeries[5].Points.AddXY(chartData[3], chartData[2]);
+            //chartSeries[3].Points.AddXY(chartData[3], chartData[0]);
+            //chartSeries[4].Points.AddXY(chartData[3], chartData[1]);
+            //chartSeries[5].Points.AddXY(chartData[3], chartData[2]);
             chartXYZ.Invalidate();
+
+            
         }
 
         private void Snapshot_Click(object sender, EventArgs e)
@@ -200,6 +213,8 @@ namespace WindowsFormsApplication6
             chartY.Series[0].Points.Clear();
             chartZ.Series[0].Points.Clear();
             for (int i = 0; i < 3; i++) chartXYZ.Series[i].Points.Clear();
+
+            dataCounter = 0;
 
             this.sensorIdToShow = Convert.ToInt32(((NumericUpDown)sender).Value);
         }
