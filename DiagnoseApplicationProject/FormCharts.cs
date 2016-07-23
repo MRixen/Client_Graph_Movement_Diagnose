@@ -129,9 +129,9 @@ namespace WindowsFormsApplication6
             //title.Font = new System.Drawing.Font("Arial", 16, FontStyle.Bold);           
         }
 
-        public void setNewChartData(Decimal[] message, string currentSensorID)
+        public void setNewChartData(Decimal[] message, int currentSensorID)
         {
-            if (sensorIdToShow == Int32.Parse(currentSensorID))
+            if (sensorIdToShow == currentSensorID)
             {
                 //if (sampleStep == sampleTimeFactor)
                 //{

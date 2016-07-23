@@ -100,5 +100,14 @@ namespace WindowsFormsApplication6.Properties {
                 return ((string)(this["ConnectionString_DataBase_RightLeg"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int sensorAmount {
+            get {
+                return ((int)(this["sensorAmount"]));
+            }
+        }
     }
 }

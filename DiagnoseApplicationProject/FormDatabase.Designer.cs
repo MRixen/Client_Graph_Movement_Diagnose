@@ -63,6 +63,8 @@
             this.label_aliveIcon = new System.Windows.Forms.Label();
             this.textBox_context = new System.Windows.Forms.TextBox();
             this.label9 = new System.Windows.Forms.Label();
+            this.buttonCalibrateSensors = new System.Windows.Forms.Button();
+            this.checkBox_showCalibData = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -346,11 +348,35 @@
             this.label9.TabIndex = 38;
             this.label9.Text = "Context";
             // 
+            // buttonCalibrateSensors
+            // 
+            this.buttonCalibrateSensors.Location = new System.Drawing.Point(359, 101);
+            this.buttonCalibrateSensors.Margin = new System.Windows.Forms.Padding(4);
+            this.buttonCalibrateSensors.Name = "buttonCalibrateSensors";
+            this.buttonCalibrateSensors.Size = new System.Drawing.Size(208, 28);
+            this.buttonCalibrateSensors.TabIndex = 39;
+            this.buttonCalibrateSensors.Text = "Calibrate Sensors";
+            this.buttonCalibrateSensors.UseVisualStyleBackColor = true;
+            this.buttonCalibrateSensors.Click += new System.EventHandler(this.button_calibrateSensors);
+            // 
+            // checkBox_showCalibData
+            // 
+            this.checkBox_showCalibData.AutoSize = true;
+            this.checkBox_showCalibData.Location = new System.Drawing.Point(362, 137);
+            this.checkBox_showCalibData.Margin = new System.Windows.Forms.Padding(4);
+            this.checkBox_showCalibData.Name = "checkBox_showCalibData";
+            this.checkBox_showCalibData.Size = new System.Drawing.Size(165, 21);
+            this.checkBox_showCalibData.TabIndex = 39;
+            this.checkBox_showCalibData.Text = "Show calibration data";
+            this.checkBox_showCalibData.UseVisualStyleBackColor = true;
+            // 
             // FormDatabase
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(643, 434);
+            this.Controls.Add(this.checkBox_showCalibData);
+            this.Controls.Add(this.buttonCalibrateSensors);
             this.Controls.Add(this.label9);
             this.Controls.Add(this.textBox_context);
             this.Controls.Add(this.label_aliveIcon);
@@ -417,5 +443,7 @@
         private System.Windows.Forms.TextBox textBox_dataBaseId;
         private System.Windows.Forms.TextBox textBox_context;
         private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.Button buttonCalibrateSensors;
+        private System.Windows.Forms.CheckBox checkBox_showCalibData;
     }
 }
