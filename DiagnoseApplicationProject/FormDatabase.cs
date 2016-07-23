@@ -48,6 +48,9 @@ namespace WindowsFormsApplication6
         private int MAX_ALIVE_SIGNAL_PAUSE = Properties.Settings.Default.MAX_ALIVE_SIGNAL_PAUSE;
         private string FILE_SAVE_PATH = Properties.Settings.Default.FILE_SAVE_PATH;
         private int SENSOR_AMOUNT = Properties.Settings.Default.sensorAmount;
+        double[] Rx_x = new double[3];
+        double[] Rx_y = new double[3];
+        double[] Rx_z = new double[3];
 
         private float recordDuration;
         //private RBC.Configuration dllConfiguration = null;
@@ -607,6 +610,7 @@ namespace WindowsFormsApplication6
                 gs_x[i] = 0;
                 gs_y[i] = 0;
                 gs_z[i] = 0;
+                sensorCalibrationSet[i] = false;
             }
             buttonCalibrateSensors.Enabled = false;
         }
@@ -687,9 +691,6 @@ namespace WindowsFormsApplication6
         {
             String message = receivedMessage[0];
             double[] sensorValues = new double[3];
-            double[] Rx_x = new double[3];
-            double[] Rx_y = new double[3];
-            double[] Rx_z = new double[3];
             int sensor_joint_ID = Int32.Parse(receivedMessage[1]);
 
             if (globalDataSet.DebugMode) Debug.WriteLine("receivedMessage: " + receivedMessage[0]);
@@ -705,20 +706,19 @@ namespace WindowsFormsApplication6
             // Split message to x, y, z and timestamp value
             String[] messageData = message.Split(':');
 
+            for (int i = 0; i < 3; i++)
+            {
+                sensorValues[i] = double.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat);
+                //Debug.WriteLine("sensorValues: " + sensorValues[i]);
+            }
+
             #region Calibration
             if ((!sensorCalibrationSet[sensor_joint_ID]) & (!buttonCalibrateSensors.Enabled))
             {
-
-                for (int i = 0; i < 3; i++)
-                {
-                    sensorValues[i] = double.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat);
-                    //Debug.WriteLine("sensorValues: " + sensorValues[i]);
-                }
                 double alpha = -(Math.PI / 2) + Math.Acos((sensorValues[2] * GRAVITATION_EARTH) / GRAVITATION_EARTH);
-                //Debug.WriteLine("alpha " + alpha);
+                Debug.WriteLine("alpha " + alpha);
 
                 // Create rotation matrix around x axis
-                // TODO: VALIDATE! Correct axis?
                 Rx_x[0] = 1;
                 Rx_x[1] = 0;
                 Rx_x[2] = 0;
@@ -731,7 +731,9 @@ namespace WindowsFormsApplication6
                 Rx_z[1] = Math.Sin(alpha);
                 Rx_z[2] = Math.Cos(alpha);
 
-                //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx[i]);
+                //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_x[i]);
+                //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_y[i]);
+                //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_z[i]);
                 // Set sensor calibration state to "calibration successfull"
                 sensorCalibrationSet[sensor_joint_ID] = true;
                 //Debug.WriteLine("Calibration finished - " + sensor_joint_ID + " -");
@@ -745,30 +747,38 @@ namespace WindowsFormsApplication6
                 // REMOVE AFTER FINISHED TEST
                 //helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
             }
+            #endregion
+
+
+
+
+            #region Set calibration data 
 
             // Modify sensor values with calibration data
-            for (int i = 0; i < 3; i++)
-            {
-                gs_x[sensor_joint_ID] = gs_x[sensor_joint_ID] + (Rx_x[i] * sensorValues[i]);
-                gs_y[sensor_joint_ID] = gs_y[sensor_joint_ID] + (Rx_y[i] * sensorValues[i]);
-                gs_z[sensor_joint_ID] = gs_z[sensor_joint_ID] + (Rx_z[i] * sensorValues[i]);
-            }
+            //for (int i = 0; i < 3; i++)
+            //{
+            //    gs_x[sensor_joint_ID] = gs_x[sensor_joint_ID] + (Rx_x[i] * sensorValues[i]);
+            //    gs_y[sensor_joint_ID] = gs_y[sensor_joint_ID] + (Rx_y[i] * sensorValues[i]);
+            //    gs_z[sensor_joint_ID] = gs_z[sensor_joint_ID] + (Rx_z[i] * sensorValues[i]);
+            //}
+            gs_x[sensor_joint_ID] = ((Rx_x[0] * sensorValues[0]) + (Rx_x[1] * sensorValues[1]) + (Rx_x[2] * sensorValues[2])) * 90;
+            gs_y[sensor_joint_ID] = ((Rx_y[0] * sensorValues[0]) + (Rx_y[1] * sensorValues[1]) + (Rx_y[2] * sensorValues[2])) * 90;
+            gs_z[sensor_joint_ID] = ((Rx_z[0] * sensorValues[0]) + (Rx_z[1] * sensorValues[1]) + (Rx_z[2] * sensorValues[2])) * 90;
+
             //Debug.WriteLine("gs_x: " + gs_x[sensor_joint_ID]);
             //Debug.WriteLine("gs_y: " + gs_y[sensor_joint_ID]);
             //Debug.WriteLine("gs_z: " + gs_z[sensor_joint_ID]);
-            #endregion
 
-            #region Set calibration data 
             // Only when mark is set
             Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
             if (checkBox_showCalibData.Checked)
             {
                 // Convert double to decimal
-                messageDataAsDecimal[0] = Convert.ToDecimal(gs_x[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat) * 45;
-                messageDataAsDecimal[1] = Convert.ToDecimal(gs_y[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat) * 45;
-                messageDataAsDecimal[2] = Convert.ToDecimal(gs_z[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat) * 45;
+                messageDataAsDecimal[0] = Convert.ToDecimal(gs_x[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
+                messageDataAsDecimal[1] = Convert.ToDecimal(gs_y[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
+                messageDataAsDecimal[2] = Convert.ToDecimal(gs_z[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
             }
-            else for (int i = 0; i < messageDataAsDecimal.Length - 1; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 45;
+            else for (int i = 0; i < messageDataAsDecimal.Length - 1; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 90;
 
             // Get timestamp
             messageDataAsDecimal[3] = Decimal.Parse(messageData[3], CultureInfo.InvariantCulture.NumberFormat);
