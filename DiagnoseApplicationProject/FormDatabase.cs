@@ -615,6 +615,11 @@ namespace WindowsFormsApplication6
             buttonCalibrateSensors.Enabled = false;
         }
 
+        private void button_Ok_Clicked(object sender, EventArgs e)
+        {
+            textBox_Info.Clear();
+        }
+
         private float calculateRecordDuration(int maxSamples, int sampleTimeFactor)
         {
             float sampleTime = SAMPLE_TIME;
@@ -705,6 +710,7 @@ namespace WindowsFormsApplication6
 
             // Split message to x, y, z and timestamp value
             String[] messageData = message.Split(':');
+            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
 
             for (int i = 0; i < 3; i++)
             {
@@ -713,64 +719,62 @@ namespace WindowsFormsApplication6
             }
 
             #region Calibration
+            if (sensor_joint_ID <= SENSOR_AMOUNT)
+            {
             if ((!sensorCalibrationSet[sensor_joint_ID]) & (!buttonCalibrateSensors.Enabled))
             {
-                double alpha = -(Math.PI / 2) + Math.Acos((sensorValues[2] * GRAVITATION_EARTH) / GRAVITATION_EARTH);
-                Debug.WriteLine("alpha " + alpha);
+                double alpha = -9999;
 
-                // Create rotation matrix around x axis
-                Rx_x[0] = 1;
-                Rx_x[1] = 0;
-                Rx_x[2] = 0;
+                // Check quadrant
+                if ((sensorValues[1] <= 0) & (sensorValues[2] < 0)) alpha = -(Math.PI / 2) + Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 1
+                else if ((sensorValues[1] <= 0) & (sensorValues[2] > 0)) alpha = (Math.PI / 2) - Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 2
 
-                Rx_y[0] = 0;
-                Rx_y[1] = Math.Cos(alpha);
-                Rx_y[2] = -Math.Sin(alpha);
-
-                Rx_z[0] = 0;
-                Rx_z[1] = Math.Sin(alpha);
-                Rx_z[2] = Math.Cos(alpha);
-
-                //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_x[i]);
-                //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_y[i]);
-                //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_z[i]);
-                // Set sensor calibration state to "calibration successfull"
-                sensorCalibrationSet[sensor_joint_ID] = true;
-                //Debug.WriteLine("Calibration finished - " + sensor_joint_ID + " -");
-
-                for (int i = 0; i < SENSOR_AMOUNT; i++)
+                if (alpha != -9999)
                 {
-                    if (!sensorCalibrationSet[i]) break;
-                    else if (i == SENSOR_AMOUNT - 1) helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
-                }
+                    // Create rotation matrix around x axis
+                    Rx_x[0] = 1;
+                    Rx_x[1] = 0;
+                    Rx_x[2] = 0;
 
-                // REMOVE AFTER FINISHED TEST
-                //helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
+                    Rx_y[0] = 0;
+                    Rx_y[1] = Math.Cos(alpha);
+                    Rx_y[2] = -Math.Sin(alpha);
+
+                    Rx_z[0] = 0;
+                    Rx_z[1] = Math.Sin(alpha);
+                    Rx_z[2] = Math.Cos(alpha);
+
+                    //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_x[i]);
+                    //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_y[i]);
+                    //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_z[i]);
+                    // Set sensor calibration state to "calibration successfull"
+                    sensorCalibrationSet[sensor_joint_ID] = true;
+                    //Debug.WriteLine("Calibration finished - " + sensor_joint_ID + " -");
+
+                    for (int i = 0; i < SENSOR_AMOUNT; i++)
+                    {
+                        if (!sensorCalibrationSet[i]) break;
+                        else if (i == SENSOR_AMOUNT - 1) helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
+                    }
+
+                }
+                else
+                {
+                    helperFunctions.changeElementText(textBox_Info, "Calibration failed!");
+                    helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
+                }
             }
             #endregion
-
-
-
 
             #region Set calibration data 
 
             // Modify sensor values with calibration data
-            //for (int i = 0; i < 3; i++)
-            //{
-            //    gs_x[sensor_joint_ID] = gs_x[sensor_joint_ID] + (Rx_x[i] * sensorValues[i]);
-            //    gs_y[sensor_joint_ID] = gs_y[sensor_joint_ID] + (Rx_y[i] * sensorValues[i]);
-            //    gs_z[sensor_joint_ID] = gs_z[sensor_joint_ID] + (Rx_z[i] * sensorValues[i]);
-            //}
             gs_x[sensor_joint_ID] = ((Rx_x[0] * sensorValues[0]) + (Rx_x[1] * sensorValues[1]) + (Rx_x[2] * sensorValues[2])) * 90;
             gs_y[sensor_joint_ID] = ((Rx_y[0] * sensorValues[0]) + (Rx_y[1] * sensorValues[1]) + (Rx_y[2] * sensorValues[2])) * 90;
             gs_z[sensor_joint_ID] = ((Rx_z[0] * sensorValues[0]) + (Rx_z[1] * sensorValues[1]) + (Rx_z[2] * sensorValues[2])) * 90;
 
-            //Debug.WriteLine("gs_x: " + gs_x[sensor_joint_ID]);
-            //Debug.WriteLine("gs_y: " + gs_y[sensor_joint_ID]);
-            //Debug.WriteLine("gs_z: " + gs_z[sensor_joint_ID]);
+            // Set calibration data only when checkbox is checked 
 
-            // Only when mark is set
-            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
             if (checkBox_showCalibData.Checked)
             {
                 // Convert double to decimal
@@ -782,7 +786,15 @@ namespace WindowsFormsApplication6
 
             // Get timestamp
             messageDataAsDecimal[3] = Decimal.Parse(messageData[3], CultureInfo.InvariantCulture.NumberFormat);
-            #endregion
+                #endregion
+            }
+            else
+            {
+                messageDataAsDecimal[0] = 0;
+                messageDataAsDecimal[1] = 0;
+                messageDataAsDecimal[2] = 0;
+                helperFunctions.changeElementText(textBox_Info, "Failure in sensor id!");
+            }
 
             // Save to db
             if (recordIsActive)

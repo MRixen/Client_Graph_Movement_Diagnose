@@ -43,7 +43,7 @@ namespace WindowsFormsApplication6.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.14")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.013")]
         public float SAMPLE_TIME {
             get {
                 return ((float)(this["SAMPLE_TIME"]));

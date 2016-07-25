@@ -65,6 +65,9 @@
             this.label9 = new System.Windows.Forms.Label();
             this.buttonCalibrateSensors = new System.Windows.Forms.Button();
             this.checkBox_showCalibData = new System.Windows.Forms.CheckBox();
+            this.textBox_Info = new System.Windows.Forms.TextBox();
+            this.label_Info = new System.Windows.Forms.Label();
+            this.button_Ok = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -100,7 +103,7 @@
             this.groupBox1.Controls.Add(this.checkBox_showDatabase);
             this.groupBox1.Controls.Add(this.textBox_sampleTimeFactorGraph);
             this.groupBox1.Controls.Add(this.checkBox_showGraphs);
-            this.groupBox1.Location = new System.Drawing.Point(13, 293);
+            this.groupBox1.Location = new System.Drawing.Point(13, 278);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
@@ -266,7 +269,7 @@
             // 
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(67, 4);
             // 
             // labelSavedRows
             // 
@@ -370,11 +373,44 @@
             this.checkBox_showCalibData.Text = "Show calibration data";
             this.checkBox_showCalibData.UseVisualStyleBackColor = true;
             // 
+            // textBox_Info
+            // 
+            this.textBox_Info.ForeColor = System.Drawing.Color.Red;
+            this.textBox_Info.Location = new System.Drawing.Point(13, 441);
+            this.textBox_Info.Multiline = true;
+            this.textBox_Info.Name = "textBox_Info";
+            this.textBox_Info.Size = new System.Drawing.Size(539, 50);
+            this.textBox_Info.TabIndex = 40;
+            // 
+            // label_Info
+            // 
+            this.label_Info.AutoSize = true;
+            this.label_Info.Location = new System.Drawing.Point(14, 421);
+            this.label_Info.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label_Info.Name = "label_Info";
+            this.label_Info.Size = new System.Drawing.Size(78, 17);
+            this.label_Info.TabIndex = 41;
+            this.label_Info.Text = "Information";
+            // 
+            // button_Ok
+            // 
+            this.button_Ok.Location = new System.Drawing.Point(566, 448);
+            this.button_Ok.Margin = new System.Windows.Forms.Padding(4);
+            this.button_Ok.Name = "button_Ok";
+            this.button_Ok.Size = new System.Drawing.Size(53, 34);
+            this.button_Ok.TabIndex = 42;
+            this.button_Ok.Text = "Clear";
+            this.button_Ok.UseVisualStyleBackColor = true;
+            this.button_Ok.Click += new System.EventHandler(this.button_Ok_Clicked);
+            // 
             // FormDatabase
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(643, 434);
+            this.ClientSize = new System.Drawing.Size(643, 503);
+            this.Controls.Add(this.button_Ok);
+            this.Controls.Add(this.label_Info);
+            this.Controls.Add(this.textBox_Info);
             this.Controls.Add(this.checkBox_showCalibData);
             this.Controls.Add(this.buttonCalibrateSensors);
             this.Controls.Add(this.label9);
@@ -399,8 +435,8 @@
             this.Controls.Add(this.button_recordToDb);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.MaximumSize = new System.Drawing.Size(661, 481);
-            this.MinimumSize = new System.Drawing.Size(661, 481);
+            this.MaximumSize = new System.Drawing.Size(661, 550);
+            this.MinimumSize = new System.Drawing.Size(661, 550);
             this.Name = "FormDatabase";
             this.Text = "Movement Diagnose";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormDatabase_Closing);
@@ -445,5 +481,8 @@
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button buttonCalibrateSensors;
         private System.Windows.Forms.CheckBox checkBox_showCalibData;
+        private System.Windows.Forms.TextBox textBox_Info;
+        private System.Windows.Forms.Label label_Info;
+        private System.Windows.Forms.Button button_Ok;
     }
 }
