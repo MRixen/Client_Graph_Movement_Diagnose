@@ -130,7 +130,7 @@ namespace WindowsFormsApplication6
             firstSensorId = -1;
             writeCycle = 0;
             savedRowCounter = 0;
-            helperFunctions.changeElementText(textBox_maxSamples, "2500"); // Write to textbox to activate event routine and dto calculate measurement duration
+            helperFunctions.changeElementText(textBox_maxSamples, "3500"); // Write to textbox to activate event routine and dto calculate measurement duration
         }
 
         private void FormDatabase_Load(object sender, EventArgs e)
@@ -726,8 +726,8 @@ namespace WindowsFormsApplication6
                 double alpha = -9999;
 
                 // Check quadrant
-                if ((sensorValues[1] <= 0) & (sensorValues[2] < 0)) alpha = -(Math.PI / 2) + Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 1
-                else if ((sensorValues[1] <= 0) & (sensorValues[2] > 0)) alpha = (Math.PI / 2) - Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 2
+                if ((sensorValues[1] >= 0) & (sensorValues[2] < 0)) alpha = -(Math.PI / 2) + Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 1
+                else if ((sensorValues[1] >= 0) & (sensorValues[2] > 0)) alpha = (Math.PI / 2) - Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 2
 
                 if (alpha != -9999)
                 {

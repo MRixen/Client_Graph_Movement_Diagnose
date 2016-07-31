@@ -170,9 +170,9 @@ namespace WindowsFormsApplication6
             chartSeries[2].Points.AddXY(chartData[3], chartData[2]);
             chartZ.Invalidate();
 
-            //chartSeries[3].Points.AddXY(chartData[3], chartData[0]);
-            //chartSeries[4].Points.AddXY(chartData[3], chartData[1]);
-            //chartSeries[5].Points.AddXY(chartData[3], chartData[2]);
+            chartSeries[3].Points.AddXY(chartData[3], chartData[0]);
+            chartSeries[4].Points.AddXY(chartData[3], chartData[1]);
+            chartSeries[5].Points.AddXY(chartData[3], chartData[2]);
             chartXYZ.Invalidate();
 
             

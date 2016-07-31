@@ -269,7 +269,7 @@
             // 
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(67, 4);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(61, 4);
             // 
             // labelSavedRows
             // 
@@ -375,6 +375,7 @@
             // 
             // textBox_Info
             // 
+            this.textBox_Info.Font = new System.Drawing.Font("Microsoft Sans Serif", 14F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBox_Info.ForeColor = System.Drawing.Color.Red;
             this.textBox_Info.Location = new System.Drawing.Point(13, 441);
             this.textBox_Info.Multiline = true;
