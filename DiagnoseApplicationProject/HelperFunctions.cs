@@ -22,26 +22,29 @@ namespace WindowsFormsApplication6
         {
         }
 
-        public void changeElementText(object element, String text)
+        public void changeElementText(object element, String text, bool add)
         {
             if ((element.GetType() == typeof(TextBox)) && ((TextBox)element).InvokeRequired) ((TextBox)element).BeginInvoke((MethodInvoker)delegate() { ((TextBox)element).Text = text; ((TextBox)element).Refresh(); });
             else if ((element.GetType() == typeof(TextBox)))
             {
-                ((TextBox)element).Text = text;
+                if (add) ((TextBox)element).Text = ((TextBox)element).Text + "\n" + text;
+                else ((TextBox)element).Text = text;
                 ((TextBox)element).Refresh();
             }
 
             if ((element.GetType() == typeof(Label)) && ((Label)element).InvokeRequired) ((Label)element).BeginInvoke((MethodInvoker)delegate() { ((Label)element).Text = text; ((Label)element).Refresh(); });
             else if ((element.GetType() == typeof(Label)))
             {
-                ((Label)element).Text = text;
+                if (add) ((Label)element).Text = ((Label)element).Text + "\n" + text;
+                else ((Label)element).Text = text;
                 ((Label)element).Refresh();
             }
 
             if ((element.GetType() == typeof(Button)) && ((Button)element).InvokeRequired) ((Button)element).BeginInvoke((MethodInvoker)delegate() { ((Button)element).Text = text; ((Button)element).Refresh(); });
             else if ((element.GetType() == typeof(Button)))
             {
-                ((Button)element).Text = text;
+                if (add) ((Button)element).Text = ((Button)element).Text + "\n" + text;
+                else ((Button)element).Text = text;
                 ((Button)element).Refresh();
             }
         }

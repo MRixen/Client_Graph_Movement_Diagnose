@@ -130,7 +130,7 @@ namespace WindowsFormsApplication6
             firstSensorId = -1;
             writeCycle = 0;
             savedRowCounter = 0;
-            helperFunctions.changeElementText(textBox_maxSamples, "3500"); // Write to textbox to activate event routine and dto calculate measurement duration
+            helperFunctions.changeElementText(textBox_maxSamples, "3500", false); // Write to textbox to activate event routine and dto calculate measurement duration
         }
 
         private void FormDatabase_Load(object sender, EventArgs e)
@@ -264,25 +264,14 @@ namespace WindowsFormsApplication6
                 // Show dialog to warn user and clear database
                 if (MessageBox.Show("Delete database content?", "Database re-initialization", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
                 {
-                    // Start timer to get timestamps
-                    notInUseByDatabase = false;
-                    if (!timer_timeStamp.IsRunning) startTimerTimestamp();
-
                     // Delete old database content
                     labelSavedRows.Text = "";
                     backgroundWorker_DeleteDb.RunWorkerAsync();
                 }
-                else
-                {
-                    // Do nothing
-                }
+                else ;// Do nothing
             }
             else
             {
-                // Stop timer and indicate that we didnt use it here
-                if (timer_timeStamp.IsRunning && notInUseByGraph) timer_timeStamp.Stop();
-                notInUseByDatabase = true;
-
                 sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
                 recordIsActive = false;
                 savedRowCounter = 0;
@@ -293,15 +282,8 @@ namespace WindowsFormsApplication6
                 helperFunctions.changeElementEnable(checkBox_showDatabase, true);
                 helperFunctions.changeElementEnable(button_importToDb, true);
                 helperFunctions.changeElementEnable(button_exportToTxt, true);
-                helperFunctions.changeElementText(button_recordToDb, "Record to db");
+                helperFunctions.changeElementText(button_recordToDb, "Record to db", false);
             }
-        }
-
-        private void startTimerTimestamp()
-        {
-            timer_timeStamp.Reset();
-            timer_timeStamp.Start();
-            timeStamp_startTime = timer_timeStamp.ElapsedMilliseconds;
         }
 
         public CheckState setCheckboxUnchecked_DbList
@@ -344,7 +326,7 @@ namespace WindowsFormsApplication6
             MAX_WRITE_CYCLE = Int32.Parse(textBox_maxSamples.Text);
             Debug.WriteLine("MAX_WRITE_CYCLE: " + MAX_WRITE_CYCLE);
             recordIsActive = true;
-            helperFunctions.changeElementText(button_recordToDb, "Stop recording");
+            helperFunctions.changeElementText(button_recordToDb, "Stop recording", false);
             helperFunctions.changeElementEnable(textBox_maxSamples, false);
             helperFunctions.changeElementEnable(textBox_sampleTimeFactor, false);
             helperFunctions.changeElementEnable(checkBox_showDatabase, false);
@@ -671,7 +653,7 @@ namespace WindowsFormsApplication6
         {
             tcpDiagnoseClient = new RBC.TcpIpCommunicationUnit("DiagnoseServer", globalDataSet);
             //register the callbackevents from tcpservers
-            tcpDiagnoseClient.messageReceivedEvent += new RBC.TcpIpCommunicationUnit.MessageReceivedEventHandler(tcpDiagnoseServer_messageReceivedEvent);
+            tcpDiagnoseClient.messageReceivedEvent += new RBC.TcpIpCommunicationUnit.MessageReceivedEventHandler(tcpMsgRecEvent);
             tcpDiagnoseClient.errorEvent += new RBC.TcpIpCommunicationUnit.ErrorEventHandler(tcpPLCServer_errorEvent);
             tcpDiagnoseClient.statusChangedEvent += new RBC.TcpIpCommunicationUnit.StatusChangedEventHandler(tcpDiagnoseServer_statusChangedEvent);
             return tcpDiagnoseClient.clientInit();
@@ -692,7 +674,7 @@ namespace WindowsFormsApplication6
             System.Windows.Forms.MessageBox.Show("Error occured - " + errorMessage);
         }
 
-        void tcpDiagnoseServer_messageReceivedEvent(string[] receivedMessage)
+        void tcpMsgRecEvent(string[] receivedMessage)
         {
             String message = receivedMessage[0];
             double[] sensorValues = new double[3];
@@ -760,7 +742,7 @@ namespace WindowsFormsApplication6
                 }
                 else
                 {
-                    helperFunctions.changeElementText(textBox_Info, "Calibration failed!");
+                    helperFunctions.changeElementText(textBox_Info, "Calibration failed!", true);
                     helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
                 }
             }
@@ -793,7 +775,7 @@ namespace WindowsFormsApplication6
                 messageDataAsDecimal[0] = 0;
                 messageDataAsDecimal[1] = 0;
                 messageDataAsDecimal[2] = 0;
-                helperFunctions.changeElementText(textBox_Info, "Failure in sensor id!");
+                helperFunctions.changeElementText(textBox_Info, "Failure in sensor id!", true);
             }
 
             // Save to db
@@ -809,7 +791,7 @@ namespace WindowsFormsApplication6
                         {
                             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
                             writeCycle++;
-                            helperFunctions.changeElementText(labelSavedRows, writeCycle.ToString());
+                            helperFunctions.changeElementText(labelSavedRows, writeCycle.ToString(), false);
                         }
                     }
                     else
@@ -821,7 +803,7 @@ namespace WindowsFormsApplication6
                         firstSensorId = -1;
                         button_recordToDb.BeginInvoke((MethodInvoker)delegate () { button_recordToDb.PerformClick(); });
                         helperFunctions.changeElementEnable(textBox_maxSamples, true);
-                        helperFunctions.changeElementText(button_recordToDb, "Record to db");
+                        helperFunctions.changeElementText(button_recordToDb, "Record to db", false);
                         MessageBox.Show("Measurement finished.");
                     }
                 }
@@ -836,17 +818,7 @@ namespace WindowsFormsApplication6
                 }
             }
             // Show sensor values in graph
-            if ((checkBox_showGraphs.Checked) && (formCharts != null))
-            {
-                // Start timer to get timestamps
-                notInUseByGraph = false;
-                if (!timer_timeStamp.IsRunning) startTimerTimestamp();
-
-                formCharts.setNewChartData(messageDataAsDecimal, sensor_joint_ID);
-            }
-            // Stop timer and indicate that we didnt use it here     
-            else if (timer_timeStamp.IsRunning && notInUseByDatabase) timer_timeStamp.Stop();
-            notInUseByGraph = true;
+            if ((checkBox_showGraphs.Checked) && (formCharts != null)) formCharts.setNewChartData(messageDataAsDecimal, sensor_joint_ID);
 
             aliveBit = false;
             if (globalDataSet.ShowProgramDuration) Debug.WriteLine(globalDataSet.Timer_programExecution.ElapsedMilliseconds - globalDataSet.TimerValue);
