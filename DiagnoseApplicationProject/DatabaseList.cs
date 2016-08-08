@@ -36,8 +36,8 @@ namespace WindowsFormsApplication6
             backgroundWorker_readDataset.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_readDataset_RunWorkerCompleted);
 
             this.tableID = Int32.Parse(numericUpDown_tableSelector.Text);
-            helperFunctions.changeElementText(labelListEntries, "List entries: " + dataSet.Tables[tableID].Rows.Count.ToString());
-            helperFunctions.changeElementText(labelDatabaseId, "Database ID: " + databaseId);
+            helperFunctions.changeElementText(labelListEntries, "List entries: " + dataSet.Tables[tableID].Rows.Count.ToString(), false);
+            helperFunctions.changeElementText(labelDatabaseId, "Database ID: " + databaseId, false);
         }
 
         private void backgroundWorker_readDataset_DoWork(object sender, DoWorkEventArgs e)
@@ -47,7 +47,7 @@ namespace WindowsFormsApplication6
 
         private void backgroundWorker_readDataset_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            helperFunctions.changeElementText(labelListEntries, "List entries: " + dataSet.Tables[tableID].Rows.Count.ToString());
+            helperFunctions.changeElementText(labelListEntries, "List entries: " + dataSet.Tables[tableID].Rows.Count.ToString(), false);
         }
 
         private void FormDatabaseList_Closing(object sender, FormClosingEventArgs e)

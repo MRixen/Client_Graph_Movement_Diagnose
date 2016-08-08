@@ -75,7 +75,8 @@ namespace WindowsFormsApplication6
         private double[] gs_x;
         private double[] gs_y;
         private double[] gs_z;
-
+        private string directoryTxtImport;
+        private int fileId;
 
         #region FORM
         public FormDatabase()
@@ -99,7 +100,7 @@ namespace WindowsFormsApplication6
             globalDataSet = new GlobalDataSet();
             helperFunctions = new HelperFunctions(globalDataSet);
 
-            globalDataSet.DebugMode = false;
+            globalDataSet.DebugMode = true;
             globalDataSet.ShowProgramDuration = false;
 
             backgroundWorker_CalculateRecordDuration.DoWork += new DoWorkEventHandler(backgroundWorker_CalculateRecordDuration_DoWork);
@@ -268,7 +269,7 @@ namespace WindowsFormsApplication6
                     labelSavedRows.Text = "";
                     backgroundWorker_DeleteDb.RunWorkerAsync();
                 }
-                else ;// Do nothing
+                else;// Do nothing
             }
             else
             {
@@ -300,7 +301,24 @@ namespace WindowsFormsApplication6
         // Import extracted movements to new db
         private void button_importToDb_Click(object sender, EventArgs e)
         {
-            backgroundWorker_loadTxtToDb.RunWorkerAsync();
+            directoryTxtImport = string.Empty;
+            string[] fileName;
+            OpenFileDialog openFileDialog1 = new OpenFileDialog();
+            openFileDialog1.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";
+            if (openFileDialog1.ShowDialog() == DialogResult.OK)
+                directoryTxtImport = openFileDialog1.FileName;
+            fileName = (openFileDialog1.SafeFileName).Substring(5).Split('.');
+            // Prevent wrong filename format
+            try
+            {
+                fileId = Int32.Parse(fileName[0]);
+                if(globalDataSet.DebugMode) Debug.WriteLine("Name: " + fileName[0]);
+                backgroundWorker_loadTxtToDb.RunWorkerAsync();
+            }
+            catch (FormatException)
+            {
+                helperFunctions.changeElementText(textBox_Info, "Filename not supported!", true);
+            }
         }
         #endregion
 
@@ -373,37 +391,36 @@ namespace WindowsFormsApplication6
             // Get the BackgroundWorker that raised this event.
             BackgroundWorker worker = sender as BackgroundWorker;
 
-            helperFunctions.changeElementEnable(button_exportToTxt, false);
-            helperFunctions.changeElementEnable(button_recordToDb, false);
-            helperFunctions.changeElementEnable(button_importToDb, false);
-
-            string returnString = "";
-
-            databaseConnection.deleteDatabaseContent(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
-            dataSet_Db2 = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
-
-
-            for (int i = 0; i < maxTableRows_Db1.Length; i++)
+            // Check if an id is inside the filename and not exeeting the limit
+            if ((fileId >= MIN_TABLE_AMOUNT) && (fileId <= MAX_TABLE_AMOUNT))
             {
-                string fileName = "table_" + i + ".txt";
-                int readCounter = 0;
+                helperFunctions.changeElementEnable(button_exportToTxt, false);
+                helperFunctions.changeElementEnable(button_recordToDb, false);
+                helperFunctions.changeElementEnable(button_importToDb, false);
 
-                using (StreamReader reader = new StreamReader(FILE_SAVE_PATH + fileName))
-                {
-                    while (!reader.EndOfStream)
+                // Delete table content in db 2
+                databaseConnection.deleteDatabaseContent(Properties.Settings.Default.ConnectionString_DataBase_RightLeg, fileId);
+
+                string returnString = string.Empty;
+
+                    int readCounter = 0;
+
+                    using (StreamReader reader = new StreamReader(directoryTxtImport))
                     {
-                        returnString = reader.ReadLine();
+                        while (!reader.EndOfStream)
+                        {
+                            returnString = reader.ReadLine();
 
-                        // Create message array from semicolon seperated text file 
-                        String[] messageData = returnString.Split(';');
-                        Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
+                            // Create message array from semicolon seperated text file 
+                            String[] messageData = returnString.Split(';');
+                            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
 
-                        for (int j = 0; i < messageDataAsDecimal.Length; j++) messageDataAsDecimal[j] = Decimal.Parse(messageData[j], CultureInfo.InvariantCulture.NumberFormat) * 90;
-                        if (readCounter > 0) writeToDb(messageDataAsDecimal, i, dataSet_Db2);
-                        readCounter++;
+                            for (int j = 0; j < 4; j++) messageDataAsDecimal[j] = Decimal.Parse(messageData[j], CultureInfo.InvariantCulture.NumberFormat);
+                            if (readCounter > 0) writeToDb(messageDataAsDecimal, fileId, dataSet_Db2);
+                            readCounter++;
+                        }
+
                     }
-
-                }
             }
         }
 
@@ -703,71 +720,71 @@ namespace WindowsFormsApplication6
             #region Calibration
             if (sensor_joint_ID <= SENSOR_AMOUNT)
             {
-            if ((!sensorCalibrationSet[sensor_joint_ID]) & (!buttonCalibrateSensors.Enabled))
-            {
-                double alpha = -9999;
-
-                // Check quadrant
-                if ((sensorValues[1] >= 0) & (sensorValues[2] < 0)) alpha = -(Math.PI / 2) + Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 1
-                else if ((sensorValues[1] >= 0) & (sensorValues[2] > 0)) alpha = (Math.PI / 2) - Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 2
-
-                if (alpha != -9999)
+                if ((!sensorCalibrationSet[sensor_joint_ID]) & (!buttonCalibrateSensors.Enabled))
                 {
-                    // Create rotation matrix around x axis
-                    Rx_x[0] = 1;
-                    Rx_x[1] = 0;
-                    Rx_x[2] = 0;
+                    double alpha = -9999;
 
-                    Rx_y[0] = 0;
-                    Rx_y[1] = Math.Cos(alpha);
-                    Rx_y[2] = -Math.Sin(alpha);
+                    // Check quadrant
+                    if ((sensorValues[1] >= 0) & (sensorValues[2] < 0)) alpha = -(Math.PI / 2) + Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 1
+                    else if ((sensorValues[1] >= 0) & (sensorValues[2] > 0)) alpha = (Math.PI / 2) - Math.Acos((sensorValues[1] * GRAVITATION_EARTH) / GRAVITATION_EARTH); // Quadrant 2
 
-                    Rx_z[0] = 0;
-                    Rx_z[1] = Math.Sin(alpha);
-                    Rx_z[2] = Math.Cos(alpha);
-
-                    //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_x[i]);
-                    //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_y[i]);
-                    //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_z[i]);
-                    // Set sensor calibration state to "calibration successfull"
-                    sensorCalibrationSet[sensor_joint_ID] = true;
-                    //Debug.WriteLine("Calibration finished - " + sensor_joint_ID + " -");
-
-                    for (int i = 0; i < SENSOR_AMOUNT; i++)
+                    if (alpha != -9999)
                     {
-                        if (!sensorCalibrationSet[i]) break;
-                        else if (i == SENSOR_AMOUNT - 1) helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
+                        // Create rotation matrix around x axis
+                        Rx_x[0] = 1;
+                        Rx_x[1] = 0;
+                        Rx_x[2] = 0;
+
+                        Rx_y[0] = 0;
+                        Rx_y[1] = Math.Cos(alpha);
+                        Rx_y[2] = -Math.Sin(alpha);
+
+                        Rx_z[0] = 0;
+                        Rx_z[1] = Math.Sin(alpha);
+                        Rx_z[2] = Math.Cos(alpha);
+
+                        //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_x[i]);
+                        //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_y[i]);
+                        //for (int i = 0; i < 3; i++) Debug.WriteLine("Rx: " + Rx_z[i]);
+                        // Set sensor calibration state to "calibration successfull"
+                        sensorCalibrationSet[sensor_joint_ID] = true;
+                        //Debug.WriteLine("Calibration finished - " + sensor_joint_ID + " -");
+
+                        for (int i = 0; i < SENSOR_AMOUNT; i++)
+                        {
+                            if (!sensorCalibrationSet[i]) break;
+                            else if (i == SENSOR_AMOUNT - 1) helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
+                        }
+
                     }
-
+                    else
+                    {
+                        helperFunctions.changeElementText(textBox_Info, "Calibration failed!", true);
+                        helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
+                    }
                 }
-                else
+                #endregion
+
+                #region Set calibration data 
+
+                // Modify sensor values with calibration data
+                gs_x[sensor_joint_ID] = ((Rx_x[0] * sensorValues[0]) + (Rx_x[1] * sensorValues[1]) + (Rx_x[2] * sensorValues[2])) * 90;
+                gs_y[sensor_joint_ID] = ((Rx_y[0] * sensorValues[0]) + (Rx_y[1] * sensorValues[1]) + (Rx_y[2] * sensorValues[2])) * 90;
+                gs_z[sensor_joint_ID] = ((Rx_z[0] * sensorValues[0]) + (Rx_z[1] * sensorValues[1]) + (Rx_z[2] * sensorValues[2])) * 90;
+
+                // Set calibration data only when checkbox is checked 
+
+                if (checkBox_showCalibData.Checked)
                 {
-                    helperFunctions.changeElementText(textBox_Info, "Calibration failed!", true);
-                    helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
+                    // Convert double to decimal
+                    messageDataAsDecimal[0] = Convert.ToDecimal(gs_x[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
+                    messageDataAsDecimal[1] = Convert.ToDecimal(gs_y[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
+                    messageDataAsDecimal[2] = Convert.ToDecimal(gs_z[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
                 }
-            }
-            #endregion
+                else for (int i = 0; i < messageDataAsDecimal.Length - 1; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 90;
 
-            #region Set calibration data 
-
-            // Modify sensor values with calibration data
-            gs_x[sensor_joint_ID] = ((Rx_x[0] * sensorValues[0]) + (Rx_x[1] * sensorValues[1]) + (Rx_x[2] * sensorValues[2])) * 90;
-            gs_y[sensor_joint_ID] = ((Rx_y[0] * sensorValues[0]) + (Rx_y[1] * sensorValues[1]) + (Rx_y[2] * sensorValues[2])) * 90;
-            gs_z[sensor_joint_ID] = ((Rx_z[0] * sensorValues[0]) + (Rx_z[1] * sensorValues[1]) + (Rx_z[2] * sensorValues[2])) * 90;
-
-            // Set calibration data only when checkbox is checked 
-
-            if (checkBox_showCalibData.Checked)
-            {
-                // Convert double to decimal
-                messageDataAsDecimal[0] = Convert.ToDecimal(gs_x[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
-                messageDataAsDecimal[1] = Convert.ToDecimal(gs_y[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
-                messageDataAsDecimal[2] = Convert.ToDecimal(gs_z[sensor_joint_ID], CultureInfo.InvariantCulture.NumberFormat);
-            }
-            else for (int i = 0; i < messageDataAsDecimal.Length - 1; i++) messageDataAsDecimal[i] = Decimal.Parse(messageData[i], CultureInfo.InvariantCulture.NumberFormat) * 90;
-
-            // Get timestamp
-            messageDataAsDecimal[3] = Decimal.Parse(messageData[3], CultureInfo.InvariantCulture.NumberFormat);
+                // Get timestamp
+                messageDataAsDecimal[3] = Decimal.Parse(messageData[3], CultureInfo.InvariantCulture.NumberFormat);
                 #endregion
             }
             else

@@ -115,7 +115,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(147, 70);
+            this.label8.Location = new System.Drawing.Point(170, 70);
             this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(105, 17);
@@ -124,7 +124,7 @@
             // 
             // textBox_dataBaseId
             // 
-            this.textBox_dataBaseId.Location = new System.Drawing.Point(149, 90);
+            this.textBox_dataBaseId.Location = new System.Drawing.Point(172, 90);
             this.textBox_dataBaseId.Margin = new System.Windows.Forms.Padding(4);
             this.textBox_dataBaseId.Name = "textBox_dataBaseId";
             this.textBox_dataBaseId.Size = new System.Drawing.Size(72, 22);
@@ -134,7 +134,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(148, 20);
+            this.label7.Location = new System.Drawing.Point(171, 20);
             this.label7.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(186, 17);
@@ -147,15 +147,15 @@
             this.checkBox_showDatabase.Location = new System.Drawing.Point(8, 90);
             this.checkBox_showDatabase.Margin = new System.Windows.Forms.Padding(4);
             this.checkBox_showDatabase.Name = "checkBox_showDatabase";
-            this.checkBox_showDatabase.Size = new System.Drawing.Size(127, 21);
+            this.checkBox_showDatabase.Size = new System.Drawing.Size(162, 21);
             this.checkBox_showDatabase.TabIndex = 12;
-            this.checkBox_showDatabase.Text = "Show database";
+            this.checkBox_showDatabase.Text = "Show database (1-2)";
             this.checkBox_showDatabase.UseVisualStyleBackColor = true;
             this.checkBox_showDatabase.CheckedChanged += new System.EventHandler(this.checkBox_showDatabase_CheckedChanged);
             // 
             // textBox_sampleTimeFactorGraph
             // 
-            this.textBox_sampleTimeFactorGraph.Location = new System.Drawing.Point(151, 39);
+            this.textBox_sampleTimeFactorGraph.Location = new System.Drawing.Point(174, 39);
             this.textBox_sampleTimeFactorGraph.Margin = new System.Windows.Forms.Padding(4);
             this.textBox_sampleTimeFactorGraph.Name = "textBox_sampleTimeFactorGraph";
             this.textBox_sampleTimeFactorGraph.Size = new System.Drawing.Size(71, 22);
@@ -167,9 +167,9 @@
             this.button_importToDb.Location = new System.Drawing.Point(359, 63);
             this.button_importToDb.Margin = new System.Windows.Forms.Padding(4);
             this.button_importToDb.Name = "button_importToDb";
-            this.button_importToDb.Size = new System.Drawing.Size(208, 28);
+            this.button_importToDb.Size = new System.Drawing.Size(168, 28);
             this.button_importToDb.TabIndex = 36;
-            this.button_importToDb.Text = "Import extracted steps to db";
+            this.button_importToDb.Text = "Import stepfile to db 2";
             this.button_importToDb.UseVisualStyleBackColor = true;
             this.button_importToDb.Click += new System.EventHandler(this.button_importToDb_Click);
             // 
@@ -178,9 +178,9 @@
             this.button_exportToTxt.Location = new System.Drawing.Point(359, 27);
             this.button_exportToTxt.Margin = new System.Windows.Forms.Padding(4);
             this.button_exportToTxt.Name = "button_exportToTxt";
-            this.button_exportToTxt.Size = new System.Drawing.Size(208, 28);
+            this.button_exportToTxt.Size = new System.Drawing.Size(168, 28);
             this.button_exportToTxt.TabIndex = 35;
-            this.button_exportToTxt.Text = "Export db to txt file";
+            this.button_exportToTxt.Text = "Export db 1 to txt file";
             this.button_exportToTxt.UseVisualStyleBackColor = true;
             this.button_exportToTxt.Click += new System.EventHandler(this.button_exportToTxt_Click);
             // 
@@ -356,7 +356,7 @@
             this.buttonCalibrateSensors.Location = new System.Drawing.Point(359, 101);
             this.buttonCalibrateSensors.Margin = new System.Windows.Forms.Padding(4);
             this.buttonCalibrateSensors.Name = "buttonCalibrateSensors";
-            this.buttonCalibrateSensors.Size = new System.Drawing.Size(208, 28);
+            this.buttonCalibrateSensors.Size = new System.Drawing.Size(168, 28);
             this.buttonCalibrateSensors.TabIndex = 39;
             this.buttonCalibrateSensors.Text = "Calibrate Sensors";
             this.buttonCalibrateSensors.UseVisualStyleBackColor = true;
