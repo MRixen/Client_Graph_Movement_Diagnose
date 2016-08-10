@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using MySql.Data.MySqlClient;
 
 namespace WindowsFormsApplication6
 {
@@ -56,6 +57,7 @@ namespace WindowsFormsApplication6
         //private RBC.Configuration dllConfiguration = null;
 
         private System.ComponentModel.BackgroundWorker backgroundWorker_CalculateRecordDuration, backgroundWorker_DataSet, backgroundWorker_DeleteDb, backgroundWorker_CheckAliveState, backgroundWorker_saveDbToTxt, backgroundWorker_loadTxtToDb;
+        private System.ComponentModel.BackgroundWorker backgroundWorker_DataSet2;
         private int sampleTimeFactor;
 
         private bool notExecuted;
@@ -75,8 +77,12 @@ namespace WindowsFormsApplication6
         private double[] gs_x;
         private double[] gs_y;
         private double[] gs_z;
+
+        // Data for upload to xampp db
         private string directoryTxtImport;
         private int fileId;
+        private bool liteVersion;
+        private string db_name;
 
         #region FORM
         public FormDatabase()
@@ -112,6 +118,7 @@ namespace WindowsFormsApplication6
             backgroundWorker_DataSet.DoWork += new DoWorkEventHandler(backgroundWorker_DataSet_DoWork);
             backgroundWorker_DataSet.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_DataSet_RunWorkerCompleted);
 
+
             backgroundWorker_saveDbToTxt.DoWork += new DoWorkEventHandler(backgroundWorker_saveDbToTxt_DoWork);
             backgroundWorker_saveDbToTxt.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_saveDbToTxt_RunWorkerCompleted);
 
@@ -122,6 +129,7 @@ namespace WindowsFormsApplication6
 
 
             // Initialize
+            liteVersion = false;
             notInUseByGraph = true;
             notInUseByDatabase = true;
             sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
@@ -136,6 +144,12 @@ namespace WindowsFormsApplication6
 
         private void FormDatabase_Load(object sender, EventArgs e)
         {
+            if (liteVersion)
+            {
+                helperFunctions.changeElementEnable(buttonCalibrateSensors, false);
+                helperFunctions.changeElementEnable(button_recordToDb, false);
+            }
+
             try
             {
                 backgroundWorker_DataSet.RunWorkerAsync();
@@ -175,7 +189,7 @@ namespace WindowsFormsApplication6
             if (((CheckBox)sender).Checked)
             {
                 // Load and start form
-                formCharts = new FormCharts(this, Int32.Parse(textBox_sampleTimeFactorGraph.Text));
+                formCharts = new FormCharts(this);
                 formCharts.chartsExitEventHandler += new FormCharts.ChartsExitEventHandler(eventMethod_chartsExitEventHandler);
                 formCharts.Show();
             }
@@ -197,7 +211,7 @@ namespace WindowsFormsApplication6
                         dataSetTemp = dataSet_Db1;
                         break;
                     case 2:
-                        dataSetTemp = dataSet_Db2;
+                        //dataSetTemp = dataSet_Db2;
                         break;
                     default:
                         dataSetTemp = dataSet_Db1;
@@ -279,7 +293,6 @@ namespace WindowsFormsApplication6
                 notExecuted = true;
                 firstSensorId = -1;
                 helperFunctions.changeElementEnable(textBox_maxSamples, true);
-                helperFunctions.changeElementEnable(textBox_sampleTimeFactor, true);
                 helperFunctions.changeElementEnable(checkBox_showDatabase, true);
                 helperFunctions.changeElementEnable(button_importToDb, true);
                 helperFunctions.changeElementEnable(button_exportToTxt, true);
@@ -298,9 +311,20 @@ namespace WindowsFormsApplication6
             backgroundWorker_saveDbToTxt.RunWorkerAsync();
         }
 
-        // Import extracted movements to new db
-        private void button_importToDb_Click(object sender, EventArgs e)
+        // Upload extracted movements to remote db
+        private void button_uploadSteps_Click(object sender, EventArgs e)
         {
+            // TODO: Extract steps automatically
+            //       - Take raw data from db 1
+            //       - Modify raw data 
+            //       - Load extracted steps / modified raw data to remote db (XAMPP)
+
+            // Actual implementation: 
+            //       - Export raw data to txt
+            //       - Extract steps manually
+            //       - Import manually extracted steps in db 1
+            //       - Upload to remote db (XAMPP)
+
             directoryTxtImport = string.Empty;
             string[] fileName;
             OpenFileDialog openFileDialog1 = new OpenFileDialog();
@@ -308,16 +332,23 @@ namespace WindowsFormsApplication6
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
                 directoryTxtImport = openFileDialog1.FileName;
             fileName = (openFileDialog1.SafeFileName).Substring(5).Split('.');
+
             // Prevent wrong filename format
             try
             {
                 fileId = Int32.Parse(fileName[0]);
-                if(globalDataSet.DebugMode) Debug.WriteLine("Name: " + fileName[0]);
-                backgroundWorker_loadTxtToDb.RunWorkerAsync();
+                if (globalDataSet.DebugMode) Debug.WriteLine("Name: " + fileName[0]);
+                db_name = textBox_dbTableName.Text;
             }
             catch (FormatException)
             {
                 helperFunctions.changeElementText(textBox_Info, "Filename not supported!", true);
+            }
+            finally
+            {
+                // Check if id is inside  filename and not exiting the limit
+                if ((fileId >= MIN_TABLE_AMOUNT) && (fileId <= MAX_TABLE_AMOUNT)) backgroundWorker_loadTxtToDb.RunWorkerAsync();
+                else helperFunctions.changeElementText(textBox_Info, "File Id not supported!", true);
             }
         }
         #endregion
@@ -329,10 +360,10 @@ namespace WindowsFormsApplication6
             BackgroundWorker worker = sender as BackgroundWorker;
 
             // Delete the content of all tables
-            databaseConnection.deleteDatabaseContent(Properties.Settings.Default.ConnectionString_DataBase_RightLeg);
-            databaseConnection.deleteDatabaseContent(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
-            dataSet_Db1 = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg);
-            dataSet_Db2 = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
+            databaseConnection.deleteDatabaseContent(Properties.Settings.Default.ConnectionString_DataBase);
+            //databaseConnection.deleteDatabaseContent(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
+            dataSet_Db1 = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase);
+            //dataSet_Db2 = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
 
             e.Result = databaseConnection.getTableSizeForDb(dataSet_Db1);
         }
@@ -346,7 +377,6 @@ namespace WindowsFormsApplication6
             recordIsActive = true;
             helperFunctions.changeElementText(button_recordToDb, "Stop recording", false);
             helperFunctions.changeElementEnable(textBox_maxSamples, false);
-            helperFunctions.changeElementEnable(textBox_sampleTimeFactor, false);
             helperFunctions.changeElementEnable(checkBox_showDatabase, false);
             helperFunctions.changeElementEnable(button_exportToTxt, false);
             helperFunctions.changeElementEnable(button_importToDb, false);
@@ -388,46 +418,45 @@ namespace WindowsFormsApplication6
 
         private void backgroundWorker_loadTxtToDb_DoWork(object sender, DoWorkEventArgs e)
         {
+            helperFunctions.changeElementEnable(checkBox_showDatabase, false);
+            helperFunctions.changeElementEnable(button_exportToTxt, false);
+            helperFunctions.changeElementEnable(button_importToDb, false);
+
             // Get the BackgroundWorker that raised this event.
             BackgroundWorker worker = sender as BackgroundWorker;
+            string returnString = string.Empty;
+            int readCounter = 0;
 
-            // Check if an id is inside the filename and not exeeting the limit
-            if ((fileId >= MIN_TABLE_AMOUNT) && (fileId <= MAX_TABLE_AMOUNT))
+            xampp_removeContent(db_name, fileId);
+
+            using (StreamReader reader = new StreamReader(directoryTxtImport))
             {
-                helperFunctions.changeElementEnable(button_exportToTxt, false);
-                helperFunctions.changeElementEnable(button_recordToDb, false);
-                helperFunctions.changeElementEnable(button_importToDb, false);
+                while (!reader.EndOfStream)
+                {
+                    returnString = reader.ReadLine();
 
-                // Delete table content in db 2
-                databaseConnection.deleteDatabaseContent(Properties.Settings.Default.ConnectionString_DataBase_RightLeg, fileId);
+                    // Create message array from semicolon seperated text file 
+                    String[] messageData = returnString.Split(';');
+                    Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
 
-                string returnString = string.Empty;
-
-                    int readCounter = 0;
-
-                    using (StreamReader reader = new StreamReader(directoryTxtImport))
+                    for (int j = 0; j < 4; j++) messageDataAsDecimal[j] = Decimal.Parse(messageData[j], CultureInfo.InvariantCulture.NumberFormat);
+                    if (readCounter > 0)
                     {
-                        while (!reader.EndOfStream)
-                        {
-                            returnString = reader.ReadLine();
-
-                            // Create message array from semicolon seperated text file 
-                            String[] messageData = returnString.Split(';');
-                            Decimal[] messageDataAsDecimal = new Decimal[messageData.Length];
-
-                            for (int j = 0; j < 4; j++) messageDataAsDecimal[j] = Decimal.Parse(messageData[j], CultureInfo.InvariantCulture.NumberFormat);
-                            if (readCounter > 0) writeToDb(messageDataAsDecimal, fileId, dataSet_Db2);
-                            readCounter++;
-                        }
+                        // Add extracted steps to xampp db with specific content
+                        xampp_addContent(db_name, fileId, messageDataAsDecimal);
+                        //writeToDb(messageDataAsDecimal, fileId, dataSet_Db1);
 
                     }
+                    readCounter++;
+                }
+
             }
         }
 
         private void backgroundWorker_loadTxtToDb_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
+            helperFunctions.changeElementEnable(checkBox_showDatabase, true);
             helperFunctions.changeElementEnable(button_exportToTxt, true);
-            helperFunctions.changeElementEnable(button_recordToDb, true);
             helperFunctions.changeElementEnable(button_importToDb, true);
         }
 
@@ -444,8 +473,8 @@ namespace WindowsFormsApplication6
             // RunWorkerCompleted eventhandler.
 
             // Create databases for the raw sensor values AND for the extracted movement
-            dataSets[0] = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg);
-            dataSets[1] = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
+            dataSets[0] = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase);
+            //dataSets[1] = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
             e.Result = dataSets;
         }
 
@@ -453,9 +482,10 @@ namespace WindowsFormsApplication6
         {
             DataSet[] dataSets = (DataSet[])e.Result;
             dataSet_Db1 = dataSets[0];
-            dataSet_Db2 = dataSets[1];
+            //dataSet_Db2 = dataSets[1];
             maxTableRows_Db1 = databaseConnection.getTableSizeForDb(dataSet_Db1);
-            helperFunctions.changeElementEnable(button_recordToDb, true);
+            Debug.WriteLine("maxTableRows_Db1: " + maxTableRows_Db1);
+            if (!liteVersion) helperFunctions.changeElementEnable(button_recordToDb, true);
             helperFunctions.changeElementEnable(checkBox_showDatabase, true);
             helperFunctions.changeElementEnable(button_exportToTxt, true);
             helperFunctions.changeElementEnable(button_importToDb, true);
@@ -468,7 +498,7 @@ namespace WindowsFormsApplication6
 
             try
             {
-                e.Result = calculateRecordDuration(Int32.Parse(textBox_maxSamples.Text), int.Parse(textBox_sampleTimeFactor.Text));
+                e.Result = calculateRecordDuration(Int32.Parse(textBox_maxSamples.Text));
             }
             catch (Exception)
             {
@@ -533,6 +563,64 @@ namespace WindowsFormsApplication6
 
         #region HELP FUNCTIONS
 
+        private void xampp_removeContent(string dbName, int tableId)
+        {
+            string conStringXampp = "Server=localhost;Database=" + dbName + "; Uid=root;Pwd=rbc;";
+            MySqlConnection connection = new MySqlConnection(conStringXampp);
+            MySqlCommand cmd;
+            connection.Open();
+
+            try
+            {
+                cmd = connection.CreateCommand();
+                cmd.CommandText = "DELETE FROM s"+tableId+" WHERE 1";
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
+
+        private void xampp_addContent(string dbName, int tableId, Decimal[] data)
+        {
+            string conStringXampp = "Server=localhost;Database="+ dbName+"; Uid=root;Pwd=rbc;";
+            MySqlConnection connection = new MySqlConnection(conStringXampp);
+            MySqlCommand cmd;
+            connection.Open();
+
+            try
+            {
+                cmd = connection.CreateCommand();
+                cmd.CommandText = "INSERT INTO s"+ tableId + "(x,y,z,timestamp)VALUES(@x,@y,@z,@timestamp)";
+                cmd.Parameters.AddWithValue("@x", data[0]);
+                cmd.Parameters.AddWithValue("@y", data[1]);
+                cmd.Parameters.AddWithValue("@z", data[2]);
+                cmd.Parameters.AddWithValue("@timestamp", data[3]);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                {
+                    connection.Close();
+                }
+            }
+        }
+
         private void saveDbToFile(int tableID, int[] maxTableRows, string fileName)
         {
             string element;
@@ -569,14 +657,14 @@ namespace WindowsFormsApplication6
             {
                 // Show dialog to give user possibility to reconnect
                 // Otherwise start other forms and continue with normal execution
-                if (MessageBox.Show("Try reconnect?", "Can't connect to server", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                if (MessageBox.Show("Start lite version?", "Can't connect to server", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) == DialogResult.OK)
                 {
-                    // user clicked yes
-                    startApplication();
+                    // user clicked ok
+                    liteVersion = true;
                 }
                 else
                 {
-                    // user clicked no
+                    // user clicked cancel
                     closeApplication();
                 }
             }
@@ -619,10 +707,10 @@ namespace WindowsFormsApplication6
             textBox_Info.Clear();
         }
 
-        private float calculateRecordDuration(int maxSamples, int sampleTimeFactor)
+        private float calculateRecordDuration(int maxSamples)
         {
             float sampleTime = SAMPLE_TIME;
-            return (maxSamples * (sampleTimeFactor * sampleTime)) / 60;
+            return (maxSamples * sampleTime) / 60;
         }
 
         private void writeToDb(Decimal[] msgArray, int tableID, DataSet dataSet)
@@ -652,15 +740,7 @@ namespace WindowsFormsApplication6
         {
             if (!backgroundWorker_CalculateRecordDuration.IsBusy)
             {
-                try
-                {
-                    if (Int32.Parse(textBox_sampleTimeFactor.Text) >= DEFAULT_SAMPLE_TIME_FACTOR) sampleTimeFactor = Int32.Parse(textBox_sampleTimeFactor.Text);
-                    else sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR;
-                }
-                catch (Exception)
-                {
-                    sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR;
-                }
+                sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR;
                 sampleStep = sampleTimeFactor;
                 backgroundWorker_CalculateRecordDuration.RunWorkerAsync();
             }

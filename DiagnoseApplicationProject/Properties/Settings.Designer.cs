@@ -81,7 +81,7 @@ namespace WindowsFormsApplication6.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
         [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\Manuel.Rixen\\Documen" +
-            "ts\\GitHub\\DataBase\\DataBase\\Database2.mdf;Initial Catalog=Database1;Integrated S" +
+            "ts\\GitHub\\DataBase\\DataBase\\Database2.mdf;Initial Catalog=Database2;Integrated S" +
             "ecurity=True")]
         public string ConnectionString_DataBase_RightLeg_extracted {
             get {
@@ -93,11 +93,11 @@ namespace WindowsFormsApplication6.Properties {
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]
         [global::System.Configuration.DefaultSettingValueAttribute("Data Source=(localdb)\\MSSQLLocalDB;AttachDbFilename=C:\\Users\\Manuel.Rixen\\Documen" +
-            "ts\\GitHub\\DataBase\\DataBase\\Database2.mdf;Initial Catalog=Database1;Integrated S" +
+            "ts\\GitHub\\DataBase\\DataBase\\Database1.mdf;Initial Catalog=Database1;Integrated S" +
             "ecurity=True")]
-        public string ConnectionString_DataBase_RightLeg {
+        public string ConnectionString_DataBase {
             get {
-                return ((string)(this["ConnectionString_DataBase_RightLeg"]));
+                return ((string)(this["ConnectionString_DataBase"]));
             }
         }
         

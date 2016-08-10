@@ -43,8 +43,8 @@ namespace WindowsFormsApplication6
                 commandBuilder3.DataAdapter.Update(dataSet.Tables[3]);
 
 
-                dataAdapterX = new SqlDataAdapter("SELECT * FROM tbl_rl_j0", dataBase_connection);
-                dataAdapterX.Fill(dataSetX, "tbl_rl_j0");
+                //dataAdapterX = new SqlDataAdapter("SELECT * FROM tbl_rl_j0", dataBase_connection);
+                //dataAdapterX.Fill(dataSetX, "tbl_rl_j0");
             }
             catch (DBConcurrencyException e)
             {
@@ -60,7 +60,7 @@ namespace WindowsFormsApplication6
             dataBase_connection.Open();
 
             // Copy content of database to dataset and close connection
-            dataSetX = new System.Data.DataSet();
+            //dataSetX = new System.Data.DataSet();
             dataSet = new System.Data.DataSet();
             //for (int i = 0; i < DATABASE_SIZE; i++)
             //{

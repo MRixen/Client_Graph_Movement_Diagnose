@@ -53,15 +53,13 @@ namespace WindowsFormsApplication6
         private int dataCounter;
         private Decimal[][] chartDataCont = new Decimal[100][];
 
-        public FormCharts(Object context, int sampleTimeFactor)
+        public FormCharts(Object context)
         {
             InitializeComponent();
             formBaseContext = (FormDatabase)context;
             initCharts();
             label_measurementContext.Text = label_measurementContext.Text + "Movement angle right leg";
-            if (sampleTimeFactor >= (DEFAULT_SAMPLE_TIME_FACTOR)) this.sampleTimeFactor = sampleTimeFactor;
-            else this.sampleTimeFactor = DEFAULT_SAMPLE_TIME_FACTOR;
-            sampleStep = this.sampleTimeFactor;
+            sampleStep = DEFAULT_SAMPLE_TIME_FACTOR;
             this.sensorIdToShow = Convert.ToInt32(numericUpDownSensorSelector.Value);
             firtStart = false;
             notifyIcon = new NotifyIcon();
