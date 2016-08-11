@@ -57,7 +57,6 @@ namespace WindowsFormsApplication6
         //private RBC.Configuration dllConfiguration = null;
 
         private System.ComponentModel.BackgroundWorker backgroundWorker_CalculateRecordDuration, backgroundWorker_DataSet, backgroundWorker_DeleteDb, backgroundWorker_CheckAliveState, backgroundWorker_saveDbToTxt, backgroundWorker_loadTxtToDb;
-        private System.ComponentModel.BackgroundWorker backgroundWorker_DataSet2;
         private int sampleTimeFactor;
 
         private bool notExecuted;
@@ -117,7 +116,6 @@ namespace WindowsFormsApplication6
 
             backgroundWorker_DataSet.DoWork += new DoWorkEventHandler(backgroundWorker_DataSet_DoWork);
             backgroundWorker_DataSet.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_DataSet_RunWorkerCompleted);
-
 
             backgroundWorker_saveDbToTxt.DoWork += new DoWorkEventHandler(backgroundWorker_saveDbToTxt_DoWork);
             backgroundWorker_saveDbToTxt.RunWorkerCompleted += new RunWorkerCompletedEventHandler(backgroundWorker_saveDbToTxt_RunWorkerCompleted);
@@ -199,25 +197,10 @@ namespace WindowsFormsApplication6
         private void checkBox_showDatabase_CheckedChanged(object sender, EventArgs e)
         {
             senderCheckbox = (CheckBox)sender;
-            int databaseId = Int32.Parse(textBox_dataBaseId.Text);
-            DataSet dataSetTemp = new DataSet();
 
             if (((CheckBox)sender).Checked)
             {
-                // Load and start form
-                switch (databaseId)
-                {
-                    case 1:
-                        dataSetTemp = dataSet_Db1;
-                        break;
-                    case 2:
-                        //dataSetTemp = dataSet_Db2;
-                        break;
-                    default:
-                        dataSetTemp = dataSet_Db1;
-                        break;
-                }
-                dataBaseList = new DatabaseList(this, dataSetTemp, databaseConnection, databaseId);
+                dataBaseList = new DatabaseList(this, dataSet_Db1, databaseConnection, 1);
                 dataBaseList.Show();
             }
             else
@@ -347,8 +330,8 @@ namespace WindowsFormsApplication6
             finally
             {
                 // Check if id is inside  filename and not exiting the limit
-                if ((fileId >= MIN_TABLE_AMOUNT) && (fileId <= MAX_TABLE_AMOUNT)) backgroundWorker_loadTxtToDb.RunWorkerAsync();
-                else helperFunctions.changeElementText(textBox_Info, "File Id not supported!", true);
+                if (((fileId >= MIN_TABLE_AMOUNT) && (fileId <= MAX_TABLE_AMOUNT)) && (db_name.Length != 0)) backgroundWorker_loadTxtToDb.RunWorkerAsync();
+                else helperFunctions.changeElementText(textBox_Info, "Wrong file id or db name", true);
             }
         }
         #endregion
@@ -465,23 +448,25 @@ namespace WindowsFormsApplication6
             // Get the BackgroundWorker that raised this event.
             BackgroundWorker worker = sender as BackgroundWorker;
             databaseConnection = new DatabaseConnection(globalDataSet);
-            DataSet[] dataSets = new DataSet[2];
+            DataSet dataSets = new DataSet();
 
             // Assign the result of the computation
             // to the Result property of the DoWorkEventArgs
             // object. This will be available to the 
             // RunWorkerCompleted eventhandler.
+            Debug.WriteLine("____");
+            Debug.WriteLine("INSIDE");
+            Debug.WriteLine("____");
 
             // Create databases for the raw sensor values AND for the extracted movement
-            dataSets[0] = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase);
+            dataSets = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase);
             //dataSets[1] = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase_RightLeg_extracted);
             e.Result = dataSets;
         }
 
         private void backgroundWorker_DataSet_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            DataSet[] dataSets = (DataSet[])e.Result;
-            dataSet_Db1 = dataSets[0];
+            dataSet_Db1 = (DataSet)e.Result;
             //dataSet_Db2 = dataSets[1];
             maxTableRows_Db1 = databaseConnection.getTableSizeForDb(dataSet_Db1);
             Debug.WriteLine("maxTableRows_Db1: " + maxTableRows_Db1);

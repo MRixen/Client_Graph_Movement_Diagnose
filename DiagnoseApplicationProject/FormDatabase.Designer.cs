@@ -45,8 +45,6 @@
             this.checkBox_showCalibData = new System.Windows.Forms.CheckBox();
             this.label9 = new System.Windows.Forms.Label();
             this.textBox_context = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
-            this.textBox_dataBaseId = new System.Windows.Forms.TextBox();
             this.checkBox_showDatabase = new System.Windows.Forms.CheckBox();
             this.button_importToDb = new System.Windows.Forms.Button();
             this.button_exportToTxt = new System.Windows.Forms.Button();
@@ -56,7 +54,6 @@
             this.backgroundWorker_CalculateRecordDuration = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker_loadTxtToDb = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker_DataSet = new System.ComponentModel.BackgroundWorker();
-            this.backgroundWorker_DataSet2 = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker_DeleteDb = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker_CheckAliveState = new System.ComponentModel.BackgroundWorker();
             this.backgroundWorker_saveDbToTxt = new System.ComponentModel.BackgroundWorker();
@@ -85,7 +82,7 @@
             // checkBox_showGraphs
             // 
             this.checkBox_showGraphs.AutoSize = true;
-            this.checkBox_showGraphs.Location = new System.Drawing.Point(413, 17);
+            this.checkBox_showGraphs.Location = new System.Drawing.Point(447, 13);
             this.checkBox_showGraphs.Margin = new System.Windows.Forms.Padding(4);
             this.checkBox_showGraphs.Name = "checkBox_showGraphs";
             this.checkBox_showGraphs.Size = new System.Drawing.Size(105, 21);
@@ -238,30 +235,10 @@
             this.textBox_context.Size = new System.Drawing.Size(168, 22);
             this.textBox_context.TabIndex = 37;
             // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(580, 42);
-            this.label8.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(39, 17);
-            this.label8.TabIndex = 38;
-            this.label8.Text = "(1-2)";
-            // 
-            // textBox_dataBaseId
-            // 
-            this.textBox_dataBaseId.Enabled = false;
-            this.textBox_dataBaseId.Location = new System.Drawing.Point(542, 41);
-            this.textBox_dataBaseId.Margin = new System.Windows.Forms.Padding(4);
-            this.textBox_dataBaseId.Name = "textBox_dataBaseId";
-            this.textBox_dataBaseId.Size = new System.Drawing.Size(35, 22);
-            this.textBox_dataBaseId.TabIndex = 37;
-            this.textBox_dataBaseId.Text = "1";
-            // 
             // checkBox_showDatabase
             // 
             this.checkBox_showDatabase.AutoSize = true;
-            this.checkBox_showDatabase.Location = new System.Drawing.Point(413, 42);
+            this.checkBox_showDatabase.Location = new System.Drawing.Point(447, 38);
             this.checkBox_showDatabase.Margin = new System.Windows.Forms.Padding(4);
             this.checkBox_showDatabase.Name = "checkBox_showDatabase";
             this.checkBox_showDatabase.Size = new System.Drawing.Size(127, 21);
@@ -390,8 +367,6 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.button_recordToDb);
-            this.Controls.Add(this.label8);
-            this.Controls.Add(this.textBox_dataBaseId);
             this.Controls.Add(this.checkBox_showDatabase);
             this.Controls.Add(this.checkBox_showGraphs);
             this.Controls.Add(this.button_importToDb);
@@ -439,8 +414,6 @@
         private System.Windows.Forms.Label label_aliveIcon;
         private System.Windows.Forms.Button button_importToDb;
         private System.Windows.Forms.Button button_exportToTxt;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.TextBox textBox_dataBaseId;
         private System.Windows.Forms.TextBox textBox_context;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Button buttonCalibrateSensors;
