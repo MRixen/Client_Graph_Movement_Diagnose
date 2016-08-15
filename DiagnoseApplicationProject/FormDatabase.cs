@@ -105,7 +105,7 @@ namespace WindowsFormsApplication6
             globalDataSet = new GlobalDataSet();
             helperFunctions = new HelperFunctions(globalDataSet);
 
-            globalDataSet.DebugMode = true;
+            globalDataSet.DebugMode = false;
             globalDataSet.ShowProgramDuration = false;
 
             backgroundWorker_CalculateRecordDuration.DoWork += new DoWorkEventHandler(backgroundWorker_CalculateRecordDuration_DoWork);
@@ -454,9 +454,6 @@ namespace WindowsFormsApplication6
             // to the Result property of the DoWorkEventArgs
             // object. This will be available to the 
             // RunWorkerCompleted eventhandler.
-            Debug.WriteLine("____");
-            Debug.WriteLine("INSIDE");
-            Debug.WriteLine("____");
 
             // Create databases for the raw sensor values AND for the extracted movement
             dataSets = databaseConnection.createDatasetsForDb(Properties.Settings.Default.ConnectionString_DataBase);
@@ -828,9 +825,6 @@ namespace WindowsFormsApplication6
                         helperFunctions.changeElementEnable(buttonCalibrateSensors, true);
                     }
                 }
-                #endregion
-
-                #region Set calibration data 
 
                 // Modify sensor values with calibration data
                 gs_x[sensor_joint_ID] = ((Rx_x[0] * sensorValues[0]) + (Rx_x[1] * sensorValues[1]) + (Rx_x[2] * sensorValues[2])) * 90;
@@ -850,7 +844,7 @@ namespace WindowsFormsApplication6
 
                 // Get timestamp
                 messageDataAsDecimal[3] = Decimal.Parse(messageData[3], CultureInfo.InvariantCulture.NumberFormat);
-                #endregion
+               
             }
             else
             {
@@ -859,6 +853,7 @@ namespace WindowsFormsApplication6
                 messageDataAsDecimal[2] = 0;
                 helperFunctions.changeElementText(textBox_Info, "Failure in sensor id!", true);
             }
+            #endregion
 
             // Save to db
             if (recordIsActive)
